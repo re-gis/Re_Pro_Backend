@@ -6,6 +6,8 @@ require("dotenv").config();
 const fileUploader = require("express-fileupload");
 const conn = require("./config/mysql/mysql");
 const connectDB = require("./config/mysql/mysql");
+const fileUpload = require("express-fileupload");
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -13,6 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 // Connect database
 connectDatabase(); // Mongobd
 connectDB(); // MySQL
+
 
 // Fileuploader
 app.use(
