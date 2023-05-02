@@ -456,7 +456,7 @@ const resetPassword = async (req, res) => {
 const uploadPicture = async (req, res) => {
   try {
     const sql = `SELECT * FROM users WHERE number = '${user.number}' AND email='${user.email}'`;
-    conn.query(sql, (error, data) => {
+    conn.query(sql, async (error, data) => {
       if (error) {
         return res.status(500).send({ message: "Internal server error..." });
       } else {
@@ -465,12 +465,53 @@ const uploadPicture = async (req, res) => {
         } else {
           // get the photo
           const photo = req.files.photo;
-          if (!photo.mimetype.startsWith('image')) {
+          if (!photo.mimetype.startsWith("image")) {
             return res.status(400).send({ message: "Upload a photo please!" });
           } else {
-            // https://github.com/Vista-innovations/Re-Pro-Backend.git
-            console.log(photo)
-            
+            const ext = photo.name.split(".")[1];
+            photo.name = `${user.name}${Date.now()}.${ext}`;
+            try {
+              // Upload photo
+              const profilePic = await cloudinary.uploader.upload(
+                photo.tempFilePath
+              );
+
+              if (!profilePic) {
+                return res
+                  .status(500)
+                  .send({ message: "Internal server error" });
+              } else {
+                // Save picture to database
+                const sql = `UPDATE users SET profilePic = '${profilePic.secure_url}', cloudinaryId= '${profilePic.public_id}' WHERE number = '${user.number}'`;
+                conn.query(sql, async (error) => {
+                  if (error) {
+                    return res
+                      .status(500)
+                      .send({ message: "Internal server error..." });
+                  } else {
+                    // Get user info
+                    const sql = `SELECT * FROM users WHERE number = '${user.number}'`;
+                    conn.query(sql, (error, data) => {
+                      if (error) {
+                        return res
+                          .status(500)
+                          .send({ message: "Internal server error..." });
+                      } else {
+                        return res.status(201).send({
+                          user: data[0],
+                          message: "Image uploaded successfully...",
+                        });
+                      }
+                    });
+                  }
+                });
+              }
+            } catch (error) {
+              console.log(error);
+              return res
+                .status(500)
+                .send({ message: "Internal server error..." });
+            }
           }
         }
       }
@@ -481,6 +522,112 @@ const uploadPicture = async (req, res) => {
   }
 };
 
+// Remove profile pic
+const profilePicRemove = async (req, res) => {
+  const userName = user.name;
+  // get user from db
+  const sql = `SELECT * FROM users  WHERE name = '${userName}'`;
+  conn.query(sql, async (error, data) => {
+    if (error) {
+      return res.status(500).send({ message: "Internal server error..." });
+    } else {
+      if (data.length === 0) {
+        return res.status(404).send({ message: "User not found!" });
+      } else {
+        // require password
+        const password = req.body.password;
+        if (!password) {
+          return res
+            .status(400)
+            .send({ message: "Password required to remove!" });
+        } else {
+          // Compare passwords
+          const validPass = await bcrypt.compare(password, data[0].password);
+          if (!validPass) {
+            return res.status(400).send({ message: "Invalid password..." });
+          } else {
+            // remove profile pic
+            const sql = `UPDATE users SET profilePic = '', cloudinaryId= '' WHERE name = '${userName}'`;
+            // const sql = `SELECT * FROM users WHERE password = '${validPass}'`
+            conn.query(sql, async (error) => {
+              if (error) {
+                console.log(error);
+                return res
+                  .status(500)
+                  .send({ message: "Internal server error..." });
+              } else {
+                // get user
+                const sql = `SELECT * FROM users  WHERE name = '${userName}'`;
+                conn.query(sql, async (error, data) => {
+                  if (error) {
+                    return res
+                      .status(500)
+                      .send({ message: "Internal server error..." });
+                  } else {
+                    return res.status(201).send({ user: data[0] });
+                  }
+                });
+              }
+            });
+          }
+        }
+      }
+    }
+  });
+};
+
+// Get any user profile
+const getAnyUserProfile = async (req, res) => {
+  // Get user from url
+  const userName = req.params.user
+  // Get user from db 
+  const sql = `SELECT * FROM users WHERE name = '${userName}'`
+  conn.query(sql, async(error,data) => {
+    if(error) {
+      return res.status(500).send({message: 'Internal server error...'})
+    } else {
+     return res.status(201).send({
+      user: data[0]
+     })
+    }
+  })
+};
+
+
+// Get my profile from token
+const getUserProfile = async (req, res) => {
+  if(!user) {
+    return res.status(404).send({message: 'User not found!'})
+  } else {
+    return res.status(201).send({
+      user
+    })
+  }
+}
+
+// Update user profile
+const updateProfile = async (req, res) => {
+  // Get username from url
+  const userName = req.params.user
+  console.log(userName)
+  // compare with the token username
+  if(userName !== user.name) {
+    return res.status(404).send({
+      message: 'User not found!'
+    })
+  } else {
+    // update the current user
+    const sql = `UPDATE users SET `
+  }
+};
+
+
+// Delete user profile
+const deleteMyAccount = async(req, res) => {
+  console.log({user: req.params.user, user2: user})
+}
+
+
 module.exports = {
   userRegister,
   verifyOtp,
@@ -489,4 +636,9 @@ module.exports = {
   forgotPassword,
   resetPassword,
   uploadPicture,
+  getAnyUserProfile,
+  updateProfile,
+  profilePicRemove,
+  getUserProfile,
+  deleteMyAccount
 };
