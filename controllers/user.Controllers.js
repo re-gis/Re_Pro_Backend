@@ -337,7 +337,7 @@ const forgotPassword = async (req, res) => {
             upperCaseAlphabets: false,
             specialChars: false,
           });
-          console.log(OTP);
+          // console.log(OTP);
 
           // Hash otp
           const hashedOtp = await bcrypt.hash(OTP, 10);
@@ -579,54 +579,83 @@ const profilePicRemove = async (req, res) => {
 // Get any user profile
 const getAnyUserProfile = async (req, res) => {
   // Get user from url
-  const userName = req.params.user
-  // Get user from db 
-  const sql = `SELECT * FROM users WHERE name = '${userName}'`
-  conn.query(sql, async(error,data) => {
-    if(error) {
-      return res.status(500).send({message: 'Internal server error...'})
+  const userName = req.params.user;
+  // Get user from db
+  const sql = `SELECT * FROM users WHERE name = '${userName}'`;
+  conn.query(sql, async (error, data) => {
+    if (error) {
+      return res.status(500).send({ message: "Internal server error..." });
     } else {
-     return res.status(201).send({
-      user: data[0]
-     })
+      return res.status(201).send({
+        user: data[0],
+      });
     }
-  })
+  });
 };
-
 
 // Get my profile from token
 const getUserProfile = async (req, res) => {
-  if(!user) {
-    return res.status(404).send({message: 'User not found!'})
+  if (!user) {
+    return res.status(404).send({ message: "User not found!" });
   } else {
     return res.status(201).send({
-      user
-    })
+      user,
+    });
   }
-}
+};
 
 // Update user profile
 const updateProfile = async (req, res) => {
   // Get username from url
-  const userName = req.params.user
-  console.log(userName)
+  const userName = req.params.user;
+  console.log(userName);
+  console.log(user);
   // compare with the token username
-  if(userName !== user.name) {
+  if (userName !== user.name) {
     return res.status(404).send({
-      message: 'User not found!'
-    })
+      message: "User not found!",
+    });
   } else {
     // update the current user
-    const sql = `UPDATE users SET `
+    // const sql = `UPDATE users SET `
   }
 };
 
-
 // Delete user profile
-const deleteMyAccount = async(req, res) => {
-  console.log({user: req.params.user, user2: user})
-}
-
+const deleteMyAccount = async (req, res) => {
+  // user from url
+  const userName = req.params.user;
+  // compare with the current user
+  if (userName !== user.name) {
+    return res.status(403).send({ message: "Not authorised!" });
+  } else {
+    // confirm using password
+    const password = req.body.password;
+    if (!password) {
+      return res.status(400).send({ message: "Password is required!" });
+    } else {
+      // compare to the token password
+      const validPass = await bcrypt.compare(password, user.password);
+      if (!validPass) {
+        return res.status(400).send({ message: "Invalid password..." });
+      } else {
+        // Delete the user from database
+        const sql = `DELETE FROM users WHERE number = '${user.number}' AND email = '${user.email}' AND name='${user.name}'`;
+        conn.query(sql, async (error) => {
+          if (error) {
+            return res
+              .status(500)
+              .send({ message: "Internal server error..." });
+          } else {
+            return res
+              .status(200)
+              .send({ message: "User account deleted successfully..." });
+          }
+        });
+      }
+    }
+  }
+};
 
 module.exports = {
   userRegister,
@@ -640,5 +669,5 @@ module.exports = {
   updateProfile,
   profilePicRemove,
   getUserProfile,
-  deleteMyAccount
+  deleteMyAccount,
 };

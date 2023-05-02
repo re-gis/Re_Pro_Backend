@@ -60,10 +60,10 @@ userRouter.post("/password/reset", resetPassword);
 userRouter.post("/profile/photo/upload", protect, uploadPicture);
 
 // Remove profile pic
-userRouter.post('/:user/profile/photo/remove', profilePicRemove)
+userRouter.post("/:user/profile/photo/remove", profilePicRemove);
 
 // get my profile
-userRouter.get('/:user/my/profile', protect, getUserProfile)
+userRouter.get("/:user/my/profile", protect, getUserProfile);
 
 // Get any user profile
 userRouter.get("/:user/profile", protect, getAnyUserProfile);
@@ -71,8 +71,7 @@ userRouter.get("/:user/profile", protect, getAnyUserProfile);
 // Update user profile
 userRouter.post("/:user/profile/update", protect, updateProfile);
 
-
 // Delete account
-userRouter.delete('/:user/profile/delete', protect, deleteMyAccount)
+userRouter.delete("/:user/profile/delete", protect, deleteMyAccount);
 
 module.exports = userRouter;
