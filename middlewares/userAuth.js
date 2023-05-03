@@ -26,7 +26,7 @@ const protect = async (req, res, next) => {
       const sql = `SELECT * FROM users WHERE user_id = '${user_id}'`;
       conn.query(sql, (error, data) => {
         if (error) {
-          console.log(error);
+          console.log(error)
           return res.status(500).send({ message: "Internal server error..." });
         } else {
           user = data[0];

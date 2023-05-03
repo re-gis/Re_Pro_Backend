@@ -218,6 +218,9 @@ const verifyOtp = async (req, res) => {
 
 // Update user stats
 const updateUserStats = async (req, res) => {
+  if (!user) {
+    return res.status(404).send({ message: "User not found!" });
+  }
   try {
     const { position, church, language, idNumber } = req.body;
     if (!position || !church || !language || !idNumber) {
@@ -280,9 +283,11 @@ const loginUser = async (req, res) => {
       const sql = `SELECT * FROM users WHERE email = '${email}'`;
       conn.query(sql, async (error, data) => {
         if (error) {
-          console.log(error);
           return res.status(500).send({ message: "Internal server error..." });
         } else {
+          if (data.length === 0) {
+            return res.status(404).send({ message: "User not found!" });
+          }
           // Compare passwords
           const validPass = await bcrypt.compare(password, data[0].password);
           if (!validPass) {
@@ -454,6 +459,9 @@ const resetPassword = async (req, res) => {
 
 // Upload profile picture
 const uploadPicture = async (req, res) => {
+  if (!user) {
+    return res.status(404).send({ message: "User not found!" });
+  }
   try {
     const sql = `SELECT * FROM users WHERE number = '${user.number}' AND email='${user.email}'`;
     conn.query(sql, async (error, data) => {
@@ -524,56 +532,60 @@ const uploadPicture = async (req, res) => {
 
 // Remove profile pic
 const profilePicRemove = async (req, res) => {
-  const userName = user.name;
-  // get user from db
-  const sql = `SELECT * FROM users  WHERE name = '${userName}'`;
-  conn.query(sql, async (error, data) => {
-    if (error) {
-      return res.status(500).send({ message: "Internal server error..." });
-    } else {
-      if (data.length === 0) {
-        return res.status(404).send({ message: "User not found!" });
+  if (!user) {
+    return res.status(404).send({ message: "No user found!" });
+  } else {
+    const userName = user.name;
+    // get user from db
+    const sql = `SELECT * FROM users  WHERE name = '${userName}'`;
+    conn.query(sql, async (error, data) => {
+      if (error) {
+        return res.status(500).send({ message: "Internal server error..." });
       } else {
-        // require password
-        const password = req.body.password;
-        if (!password) {
-          return res
-            .status(400)
-            .send({ message: "Password required to remove!" });
+        if (data.length === 0) {
+          return res.status(404).send({ message: "User not found!" });
         } else {
-          // Compare passwords
-          const validPass = await bcrypt.compare(password, data[0].password);
-          if (!validPass) {
-            return res.status(400).send({ message: "Invalid password..." });
+          // require password
+          const password = req.body.password;
+          if (!password) {
+            return res
+              .status(400)
+              .send({ message: "Password required to remove!" });
           } else {
-            // remove profile pic
-            const sql = `UPDATE users SET profilePic = '', cloudinaryId= '' WHERE name = '${userName}'`;
-            // const sql = `SELECT * FROM users WHERE password = '${validPass}'`
-            conn.query(sql, async (error) => {
-              if (error) {
-                console.log(error);
-                return res
-                  .status(500)
-                  .send({ message: "Internal server error..." });
-              } else {
-                // get user
-                const sql = `SELECT * FROM users  WHERE name = '${userName}'`;
-                conn.query(sql, async (error, data) => {
-                  if (error) {
-                    return res
-                      .status(500)
-                      .send({ message: "Internal server error..." });
-                  } else {
-                    return res.status(201).send({ user: data[0] });
-                  }
-                });
-              }
-            });
+            // Compare passwords
+            const validPass = await bcrypt.compare(password, data[0].password);
+            if (!validPass) {
+              return res.status(400).send({ message: "Invalid password..." });
+            } else {
+              // remove profile pic
+              const sql = `UPDATE users SET profilePic = '', cloudinaryId= '' WHERE name = '${userName}'`;
+              // const sql = `SELECT * FROM users WHERE password = '${validPass}'`
+              conn.query(sql, async (error) => {
+                if (error) {
+                  console.log(error);
+                  return res
+                    .status(500)
+                    .send({ message: "Internal server error..." });
+                } else {
+                  // get user
+                  const sql = `SELECT * FROM users  WHERE name = '${userName}'`;
+                  conn.query(sql, async (error, data) => {
+                    if (error) {
+                      return res
+                        .status(500)
+                        .send({ message: "Internal server error..." });
+                    } else {
+                      return res.status(201).send({ user: data[0] });
+                    }
+                  });
+                }
+              });
+            }
           }
         }
       }
-    }
-  });
+    });
+  }
 };
 
 // Get any user profile
@@ -586,6 +598,9 @@ const getAnyUserProfile = async (req, res) => {
     if (error) {
       return res.status(500).send({ message: "Internal server error..." });
     } else {
+      if (data.length === 0) {
+        return res.status(404).send({ message: "User not found!" });
+      }
       return res.status(201).send({
         user: data[0],
       });
@@ -606,6 +621,9 @@ const getUserProfile = async (req, res) => {
 
 // Update user profile
 const updateProfile = async (req, res) => {
+  if(!user) {
+    return res.status(404).send({message: 'User not found!'})
+  }
   // Get username from url
   const userName = req.params.user;
   console.log(userName);
@@ -623,6 +641,9 @@ const updateProfile = async (req, res) => {
 
 // Delete user profile
 const deleteMyAccount = async (req, res) => {
+  if(!user) {
+    return res.status(404).send({message: 'User not found!'})
+  }
   // user from url
   const userName = req.params.user;
   // compare with the current user
@@ -657,6 +678,38 @@ const deleteMyAccount = async (req, res) => {
   }
 };
 
+// Total workers
+const getTotalWorkers = async (req, res) => {
+  // get users number
+  const sql = `SELECT * FROM users`;
+  conn.query(sql, (error, data) => {
+    if (error) {
+      return res.status(500).send({ message: "Internal server error..." });
+    } else {
+      return res.status(201).send({
+        users: data,
+        totalNumber: data.length,
+      });
+    }
+  });
+};
+
+// Get pastors
+const getPastors = async (req, res) => {
+  // get users whose position = pastor
+  const sql = `SELECT * FROM users WHERE position = 'pastor'`;
+  conn.query(sql, (error, data) => {
+    if (error) {
+      return res.status(500).send({ message: "Internal server error..." });
+    } else {
+      return res.status(201).send({
+        pastors: data,
+        totalNumber: data.length,
+      });
+    }
+  });
+};
+
 module.exports = {
   userRegister,
   verifyOtp,
@@ -670,4 +723,6 @@ module.exports = {
   profilePicRemove,
   getUserProfile,
   deleteMyAccount,
+  getTotalWorkers,
+  getPastors,
 };

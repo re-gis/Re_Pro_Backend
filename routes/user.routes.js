@@ -12,6 +12,8 @@ const {
   profilePicRemove,
   getAnyUserProfile,
   deleteMyAccount,
+  getTotalWorkers,
+  getPastors,
 } = require("../controllers/user.Controllers");
 const userRouter = express.Router();
 const passport = require("passport");
@@ -45,7 +47,7 @@ userRouter.get(
 );
 
 // Update user stats
-userRouter.post("/register/update", protect, updateUserStats);
+userRouter.put("/register/update", protect, updateUserStats);
 
 // Login user
 userRouter.post("/login", loginUser);
@@ -60,7 +62,7 @@ userRouter.post("/password/reset", resetPassword);
 userRouter.post("/profile/photo/upload", protect, uploadPicture);
 
 // Remove profile pic
-userRouter.post("/:user/profile/photo/remove", profilePicRemove);
+userRouter.put("/:user/profile/photo/remove", protect, profilePicRemove);
 
 // get my profile
 userRouter.get("/:user/my/profile", protect, getUserProfile);
@@ -69,9 +71,16 @@ userRouter.get("/:user/my/profile", protect, getUserProfile);
 userRouter.get("/:user/profile", protect, getAnyUserProfile);
 
 // Update user profile
-userRouter.post("/:user/profile/update", protect, updateProfile);
+userRouter.put("/:user/profile/update", protect, updateProfile);
 
 // Delete account
 userRouter.delete("/:user/profile/delete", protect, deleteMyAccount);
+
+// Get total workers
+userRouter.get('/workers', getTotalWorkers)
+
+
+// Get pastors
+userRouter.get('/workers/pastors', getPastors)
 
 module.exports = userRouter;
