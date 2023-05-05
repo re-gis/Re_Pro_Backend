@@ -65,6 +65,7 @@ const userRegister = async (req, res) => {
                 upperCaseAlphabets: false,
                 specialChars: false,
               });
+              console.log(OTP);
 
               // Hash otp
               const hashedOtp = await bcrypt.hash(OTP, 10);
@@ -621,28 +622,62 @@ const getUserProfile = async (req, res) => {
 
 // Update user profile
 const updateProfile = async (req, res) => {
-  if(!user) {
-    return res.status(404).send({message: 'User not found!'})
+  if (!user) {
+    return res.status(404).send({ message: "User not found!" });
   }
   // Get username from url
   const userName = req.params.user;
-  console.log(userName);
-  console.log(user);
   // compare with the token username
   if (userName !== user.name) {
     return res.status(404).send({
       message: "User not found!",
     });
   } else {
-    // update the current user
-    // const sql = `UPDATE users SET `
+    const newUsername = req.body.username ? req.body.username : user.name;
+    const newEmail = req.body.email ? req.body.email : user.email;
+    const newNumber = req.body.number ? req.body.number : user.number;
+    const newposition = req.body.position ? req.body.position : user.position;
+    const church = req.body.position ? req.body.church : user.church;
+
+    // Confirm using password
+    const password = req.body.password;
+    if (!password || !(await bcrypt.compare(password, user.password))) {
+      return res
+        .status(403)
+        .send({ message: "Confirm password to proceed..." });
+    } else {
+      // Update the user profile
+      const sql = `UPDATE users SET name = '${newUsername}', email='${newEmail}' , number='${newNumber}' , church ='${church}', position='${newposition}' WHERE name = '${user.name}' AND number='${user.number}'`;
+      conn.query(sql, async (error) => {
+        if (error) {
+          console.log(error);
+          return res.status(500).send({ message: "Internal server error..." });
+        } else {
+          // Get the user
+          const sql = `SELECT * FROM users WHERE number = '${user.number}' AND email='${user.email}'`;
+          conn.query(sql, async (error, data) => {
+            if (error)
+              return res
+                .status(500)
+                .send({ message: "Internal server error..." });
+            if (data.length === 0)
+              return res.status(404).send({ message: "User not found!" });
+            return res.status(201).send({
+              user: data[0],
+              message: "User profile data updated successfully!",
+              token: generateToken(data[0]),
+            });
+          });
+        }
+      });
+    }
   }
 };
 
 // Delete user profile
 const deleteMyAccount = async (req, res) => {
-  if(!user) {
-    return res.status(404).send({message: 'User not found!'})
+  if (!user) {
+    return res.status(404).send({ message: "User not found!" });
   }
   // user from url
   const userName = req.params.user;
@@ -710,6 +745,57 @@ const getPastors = async (req, res) => {
   });
 };
 
+// Change user password
+const passwordChange = async (req, res) => {
+  if (!user) return res.status(404).send({ message: "User not found!" });
+  // Get user from the url
+  const userName = req.params.user;
+  // Compare to token
+  if (userName === user.name) {
+    // Get password
+    const newPassword = req.body.newPassword;
+    const oldPassword = req.body.oldPassword;
+    const cp = req.body.confirmPass;
+
+    if (!oldPassword)
+      return res.status(400).send({ message: "Enter old password" });
+    // Check if it matches the user's
+    const validPass = await bcrypt.compare(oldPassword, user.password);
+    if (!validPass)
+      return res.status(403).send({ message: "Invalid password given!" });
+    if (!newPassword)
+      return res.status(400).send({ message: "Enter new password..." });
+    // Change the password
+    if (newPassword !== cp)
+      return res
+        .status(400)
+        .send({ message: "Confirm password to proceed..." });
+    const hp = await bcrypt.hash(newPassword, 10);
+    const sql = `UPDATE users SET password='${hp}' WHERE number = '${user.number}' AND name='${user.name}' AND email='${user.email}'`;
+    conn.query(sql, async (error) => {
+      // console.log(error)
+      if (error)
+        return res.status(500).send({ message: "Internal server error..." });
+      // Get the user from database
+      const sql = `SELECT * FROM users WHERE number ='${user.number}' AND email='${user.email}'`;
+      conn.query(sql, async (error, data) => {
+        if (error)
+          // console.log(error)
+          return res.status(500).send({ message: "Internal server error..." });
+        if (data.length === 0)
+          return res.status(404).send({ message: "User not found!" });
+        return res
+          .status(201)
+          .send({ message: "Password updated successfully!", user: data[0] });
+      });
+    });
+  } else {
+    return res
+      .status(404)
+      .send({ message: "Not authorised to perform this action!" });
+  }
+};
+
 module.exports = {
   userRegister,
   verifyOtp,
@@ -725,4 +811,5 @@ module.exports = {
   deleteMyAccount,
   getTotalWorkers,
   getPastors,
+  passwordChange,
 };

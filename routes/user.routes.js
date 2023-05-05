@@ -14,6 +14,7 @@ const {
   deleteMyAccount,
   getTotalWorkers,
   getPastors,
+  passwordChange,
 } = require("../controllers/user.Controllers");
 const userRouter = express.Router();
 const passport = require("passport");
@@ -53,10 +54,10 @@ userRouter.put("/register/update", protect, updateUserStats);
 userRouter.post("/login", loginUser);
 
 // Forgot password
-userRouter.post("/password/forgot", forgotPassword);
+userRouter.post("/password/forgot",protect, forgotPassword);
 
 // Reset password
-userRouter.post("/password/reset", resetPassword);
+userRouter.post("/password/reset",protect, resetPassword);
 
 // Upload profile picture
 userRouter.post("/profile/photo/upload", protect, uploadPicture);
@@ -82,5 +83,8 @@ userRouter.get('/workers', getTotalWorkers)
 
 // Get pastors
 userRouter.get('/workers/pastors', getPastors)
+
+// Change user password
+userRouter.put('/:user/profile/password/change', protect, passwordChange)
 
 module.exports = userRouter;
