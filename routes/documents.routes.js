@@ -1,10 +1,10 @@
 const express = require('express')
-const { createDocument } = require('../controllers/documents.controller')
+const { deleteDoc } = require('../controllers/documents.controller')
 const protect = require('../middlewares/userAuth')
-// const documentRouter = express.Router()
+const documentRouter = express.Router()
 
 
-// // create a document
-// documentRouter.post('/:user/create', protect, createDocument)
+// Delete a document
+documentRouter.delete('/:user/doc/:id/delete', protect, deleteDoc)
 
-// module.exports = documentRouter
+module.exports = documentRouter

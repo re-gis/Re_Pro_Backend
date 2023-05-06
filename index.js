@@ -7,11 +7,11 @@ const fileUploader = require("express-fileupload");
 const mysql = require("mysql");
 const connectDB = require("./config/mysql/mysql");
 const currencyRouter = require("./routes/currency.routes");
-// const documentRouter = require("./routes/documents.routes");
 const cors = require("cors");
 const multer = require("multer");
 const bodyParser = require("body-parser");
 const protect = require("./middlewares/userAuth");
+const documentRouter = require("./routes/documents.routes");
 
 const conn = mysql.createConnection({
   host: "localhost",
@@ -82,6 +82,9 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
   });
 });
 
+
+app.use('/api/docs', documentRouter)
+
 // Use cors
 app.use(cors());
 
@@ -99,8 +102,8 @@ app.use("/api/users", userRouter);
 // Currency apis
 app.use("/api/currency", currencyRouter);
 
-// Document apis
-// app.use("/api/document", documentRouter);
+// Room chat apis
+app.use("/api/chat", require("./routes/chat.routes"));
 
 app.listen(process.env.PORT, () => {
   console.log(`server listening port ${process.env.PORT}`);

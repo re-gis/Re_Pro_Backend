@@ -9,7 +9,6 @@ const jwt = require("jsonwebtoken");
 const { cloudinary } = require("../config/cloudinary/cloudinary");
 
 const object = Joi.object({
-  name: Joi.string().min(5).max(100),
   email: Joi.string().min(3).email().max(200).required(),
   password: Joi.string().min(8).max(100).required(),
   number: Joi.string().required(),
@@ -41,7 +40,7 @@ const generateToken = (user) => {
 const userRegister = async (req, res) => {
   try {
     const { email, number, password, name } = req.body;
-    if (!email || !password || !number || !name) {
+    if (!email || !password || !number) {
       return res.status(400).send({ message: "All credentials are required!" });
     } else {
       const { error } = object.validate(req.body);
@@ -79,6 +78,12 @@ const userRegister = async (req, res) => {
                     .status(500)
                     .send({ message: "Internal server error..." });
                 } else {
+                  if (data.length !== 0)
+                    return res
+                      .status(400)
+                      .send({
+                        message: "User already exists! Verify to proceed...",
+                      });
                   // Save otp to database
                   const sql2 = `INSERT INTO otps (number, otp) VALUES ('${number}', '${hashedOtp}')`;
                   conn.query(sql2, async (error, data) => {
@@ -104,7 +109,7 @@ const userRegister = async (req, res) => {
                         } else {
                           const hashedPass = await bcrypt.hash(password, 10);
                           // Save user
-                          const sql = `INSERT INTO users (email, password, number, name) VALUES ('${email}', '${hashedPass}', '${number}', '${name}')`;
+                          const sql = `INSERT INTO users (email, password, number) VALUES ('${email}', '${hashedPass}', '${number}')`;
                           conn.query(sql, async (error, data) => {
                             if (error) {
                               return res
@@ -220,7 +225,7 @@ const verifyOtp = async (req, res) => {
 // Update user stats
 const updateUserStats = async (req, res) => {
   if (!user) {
-    return res.status(404).send({ message: "User not found!" });
+    return res.status(401).send({ message: "User not found!" });
   }
   try {
     const { position, church, language, idNumber } = req.body;
@@ -287,7 +292,7 @@ const loginUser = async (req, res) => {
           return res.status(500).send({ message: "Internal server error..." });
         } else {
           if (data.length === 0) {
-            return res.status(404).send({ message: "User not found!" });
+            return res.status(401).send({ message: "User not found!" });
           }
           // Compare passwords
           const validPass = await bcrypt.compare(password, data[0].password);
@@ -333,7 +338,7 @@ const forgotPassword = async (req, res) => {
       } else {
         if (data.length === 0) {
           return res
-            .status(404)
+            .status(401)
             .send({ message: "Enter number you signed in with!" });
         } else {
           // Generate otp
@@ -410,12 +415,12 @@ const resetPassword = async (req, res) => {
       return res.status(500).send({ message: "Internal server error..." });
     } else {
       if (data.length === 0) {
-        return res.status(404).send({ message: "User not found!" });
+        return res.status(401).send({ message: "User not found!" });
       }
       // Verify otp
       const validOtp = await bcrypt.compare(otp, data[0].otp);
       if (!validOtp) {
-        return res.status(404).send({ message: "Invalid code..." });
+        return res.status(401).send({ message: "Invalid code..." });
       } else {
         // Reset password
         const newPass = await bcrypt.hash(password, 10);
@@ -461,7 +466,7 @@ const resetPassword = async (req, res) => {
 // Upload profile picture
 const uploadPicture = async (req, res) => {
   if (!user) {
-    return res.status(404).send({ message: "User not found!" });
+    return res.status(401).send({ message: "User not found!" });
   }
   try {
     const sql = `SELECT * FROM users WHERE number = '${user.number}' AND email='${user.email}'`;
@@ -534,7 +539,7 @@ const uploadPicture = async (req, res) => {
 // Remove profile pic
 const profilePicRemove = async (req, res) => {
   if (!user) {
-    return res.status(404).send({ message: "No user found!" });
+    return res.status(401).send({ message: "No user found!" });
   } else {
     const userName = user.name;
     // get user from db
@@ -544,7 +549,7 @@ const profilePicRemove = async (req, res) => {
         return res.status(500).send({ message: "Internal server error..." });
       } else {
         if (data.length === 0) {
-          return res.status(404).send({ message: "User not found!" });
+          return res.status(401).send({ message: "User not found!" });
         } else {
           // require password
           const password = req.body.password;
@@ -600,7 +605,7 @@ const getAnyUserProfile = async (req, res) => {
       return res.status(500).send({ message: "Internal server error..." });
     } else {
       if (data.length === 0) {
-        return res.status(404).send({ message: "User not found!" });
+        return res.status(401).send({ message: "User not found!" });
       }
       return res.status(201).send({
         user: data[0],
@@ -612,7 +617,7 @@ const getAnyUserProfile = async (req, res) => {
 // Get my profile from token
 const getUserProfile = async (req, res) => {
   if (!user) {
-    return res.status(404).send({ message: "User not found!" });
+    return res.status(401).send({ message: "User not found!" });
   } else {
     return res.status(201).send({
       user,
@@ -623,13 +628,13 @@ const getUserProfile = async (req, res) => {
 // Update user profile
 const updateProfile = async (req, res) => {
   if (!user) {
-    return res.status(404).send({ message: "User not found!" });
+    return res.status(401).send({ message: "User not found!" });
   }
   // Get username from url
   const userName = req.params.user;
   // compare with the token username
   if (userName !== user.name) {
-    return res.status(404).send({
+    return res.status(401).send({
       message: "User not found!",
     });
   } else {
@@ -661,7 +666,7 @@ const updateProfile = async (req, res) => {
                 .status(500)
                 .send({ message: "Internal server error..." });
             if (data.length === 0)
-              return res.status(404).send({ message: "User not found!" });
+              return res.status(401).send({ message: "User not found!" });
             return res.status(201).send({
               user: data[0],
               message: "User profile data updated successfully!",
@@ -677,7 +682,7 @@ const updateProfile = async (req, res) => {
 // Delete user profile
 const deleteMyAccount = async (req, res) => {
   if (!user) {
-    return res.status(404).send({ message: "User not found!" });
+    return res.status(401).send({ message: "User not found!" });
   }
   // user from url
   const userName = req.params.user;
@@ -747,7 +752,7 @@ const getPastors = async (req, res) => {
 
 // Change user password
 const passwordChange = async (req, res) => {
-  if (!user) return res.status(404).send({ message: "User not found!" });
+  if (!user) return res.status(401).send({ message: "User not found!" });
   // Get user from the url
   const userName = req.params.user;
   // Compare to token
@@ -783,7 +788,7 @@ const passwordChange = async (req, res) => {
           // console.log(error)
           return res.status(500).send({ message: "Internal server error..." });
         if (data.length === 0)
-          return res.status(404).send({ message: "User not found!" });
+          return res.status(401).send({ message: "User not found!" });
         return res
           .status(201)
           .send({ message: "Password updated successfully!", user: data[0] });
@@ -791,7 +796,7 @@ const passwordChange = async (req, res) => {
     });
   } else {
     return res
-      .status(404)
+      .status(401)
       .send({ message: "Not authorised to perform this action!" });
   }
 };

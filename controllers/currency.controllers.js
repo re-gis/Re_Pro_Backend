@@ -92,7 +92,7 @@ const conn = mysql.createConnection({
 // Creating funds
 const createFund = async (req, res) => {
   if (!user) {
-    return res.status(404).send({ message: "User not found!" });
+    return res.status(401).send({ message: "User not found!" });
   }
   const n = user.name;
   const num = user.number;
@@ -184,7 +184,7 @@ const createFund = async (req, res) => {
 // Returning the funds
 const getFunds = async (req, res) => {
   if (!user) {
-    return res.status(404).send({ message: "User not found!" });
+    return res.status(401).send({ message: "User not found!" });
   }
   const s = `SELECT * FROM currency WHERE number = '${user.number}' AND owner = '${user.name}'`;
   conn.query(s, (e, d) => {
@@ -192,7 +192,7 @@ const getFunds = async (req, res) => {
       return res.status(500).send({ message: "Internal server error..." });
     } else {
       if (d.length === 0) {
-        return res.status(404).send({ message: "No funds found!" });
+        return res.status(401).send({ message: "No funds found!" });
       } else {
         return res.status(201).send({
           funds: d,
@@ -205,7 +205,7 @@ const getFunds = async (req, res) => {
 // Update the funds
 const updateFund = async (req, res) => {
   if (!user) {
-    return res.status(404).send({ message: "User not found!" });
+    return res.status(401).send({ message: "User not found!" });
   }
   if (req.params.me === user.name) {
     // Check if it exists
@@ -215,7 +215,7 @@ const updateFund = async (req, res) => {
         return res.status(500).send({ message: "Internal server error..." });
       } else {
         if (data.length === 0) {
-          return res.status(404).send({ message: "Fund not found..." });
+          return res.status(401).send({ message: "Fund not found..." });
         }
         // Get total amount, expenses, profit and loss
         const t = req.body.totalAmount

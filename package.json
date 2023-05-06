@@ -3,6 +3,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cloudinary": "^1.36.2",
+    "concurrently": "^8.0.1",
     "cors": "^2.8.5",
     "docxtemplater": "^3.37.2",
     "dotenv": "^16.0.3",
@@ -24,8 +25,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "server": "nodemon index.js"
+    "start": "cd socketServer && nodemon index.js",
+    "server": "nodemon index.js",
+    "dev": "concurrently \"npm run server\" \"npm start\""
   },
   "author": "",
   "license": "ISC",
