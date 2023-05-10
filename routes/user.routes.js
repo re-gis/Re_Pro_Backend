@@ -54,10 +54,10 @@ userRouter.put("/register/update", protect, updateUserStats);
 userRouter.post("/login", loginUser);
 
 // Forgot password
-userRouter.post("/password/forgot",protect, forgotPassword);
+userRouter.post("/password/forgot", protect, forgotPassword);
 
 // Reset password
-userRouter.post("/password/reset",protect, resetPassword);
+userRouter.post("/password/reset", protect, resetPassword);
 
 // Upload profile picture
 userRouter.post("/profile/photo/upload", protect, uploadPicture);
@@ -78,13 +78,12 @@ userRouter.put("/:user/profile/update", protect, updateProfile);
 userRouter.delete("/:user/profile/delete", protect, deleteMyAccount);
 
 // Get total workers
-userRouter.get('/workers', getTotalWorkers)
-
+userRouter.get("/workers", getTotalWorkers);
 
 // Get pastors
-userRouter.get('/workers/pastors', getPastors)
+userRouter.get("/workers/pastors", getPastors);
 
 // Change user password
-userRouter.put('/:user/profile/password/change', protect, passwordChange)
+userRouter.put("/:user/profile/password/change", protect, passwordChange);
 
 module.exports = userRouter;

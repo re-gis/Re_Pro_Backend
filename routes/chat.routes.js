@@ -7,7 +7,7 @@ const protect = require('../middlewares/userAuth');
 chatRouter.post('/room/create', protect,createRoom)
 
 // get rooms
-chatRouter.get('/rooms', getRooms)
+chatRouter.get('/rooms', protect, getRooms)
 
 // get room by id
 chatRouter.get('/room/:id', getRoomById)

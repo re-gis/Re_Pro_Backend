@@ -12,6 +12,8 @@ const multer = require("multer");
 const bodyParser = require("body-parser");
 const protect = require("./middlewares/userAuth");
 const documentRouter = require("./routes/documents.routes");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 
 const conn = mysql.createConnection({
   host: "localhost",
@@ -26,6 +28,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Connect database
 connectDatabase(); // MongoDB
 connectDB(); // MySQL
+
+// Swagger documentation
+
+app.use("/documentation", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /* Upload a document
    ----------------- */
@@ -82,8 +88,7 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
   });
 });
 
-
-app.use('/api/docs', documentRouter)
+app.use("/api/docs", documentRouter);
 
 // Use cors
 app.use(cors());

@@ -39,7 +39,7 @@ const generateToken = (user) => {
 // User register
 const userRegister = async (req, res) => {
   try {
-    const { email, number, password, name } = req.body;
+    const { email, number, password } = req.body;
     if (!email || !password || !number) {
       return res.status(400).send({ message: "All credentials are required!" });
     } else {
@@ -50,6 +50,7 @@ const userRegister = async (req, res) => {
         let sql = `SELECT * FROM users WHERE email = '${email}' OR number = '${number}'`;
         conn.query(sql, async (error, data) => {
           if (error) {
+            console.log(error)
             return res
               .status(500)
               .send({ message: "Internal server error..." });
@@ -112,6 +113,7 @@ const userRegister = async (req, res) => {
                           const sql = `INSERT INTO users (email, password, number) VALUES ('${email}', '${hashedPass}', '${number}')`;
                           conn.query(sql, async (error, data) => {
                             if (error) {
+                              console.log(error);
                               return res
                                 .status(500)
                                 .send({ message: "Internal server error..." });
@@ -325,6 +327,7 @@ const loginUser = async (req, res) => {
 
 // Forgot password
 const forgotPassword = async (req, res) => {
+  if(!user) return res.status(400).send({message: 'User not found!'})
   const number = req.body.number;
   if (!number) {
     return res.status(400).send({ message: "Please number is required!" });
@@ -627,7 +630,7 @@ const getUserProfile = async (req, res) => {
 
 // Update user profile
 const updateProfile = async (req, res) => {
-  if (!user) {
+  if (!user && (user.name !== req.params.user)) {
     return res.status(401).send({ message: "User not found!" });
   }
   // Get username from url
@@ -659,7 +662,7 @@ const updateProfile = async (req, res) => {
           return res.status(500).send({ message: "Internal server error..." });
         } else {
           // Get the user
-          const sql = `SELECT * FROM users WHERE number = '${user.number}' AND email='${user.email}'`;
+          const sql = `SELECT * FROM users WHERE number = '${newNumber}' AND email='${newEmail}'`;
           conn.query(sql, async (error, data) => {
             if (error)
               return res
@@ -723,7 +726,9 @@ const getTotalWorkers = async (req, res) => {
   // get users number
   const sql = `SELECT * FROM users`;
   conn.query(sql, (error, data) => {
+
     if (error) {
+      console.log(error)
       return res.status(500).send({ message: "Internal server error..." });
     } else {
       return res.status(201).send({
@@ -740,6 +745,7 @@ const getPastors = async (req, res) => {
   const sql = `SELECT * FROM users WHERE position = 'pastor'`;
   conn.query(sql, (error, data) => {
     if (error) {
+      console.log(error)
       return res.status(500).send({ message: "Internal server error..." });
     } else {
       return res.status(201).send({
