@@ -37,7 +37,7 @@ const getMyDocs = async(req, res) => {
     if(err) return res.status(500).send({message: 'Internal server error...'})
     if(data.length === 0) return res.status(400).send({message: 'No sent documents found!'})
     return res.status(200).send({
-      userDoc:data[0],
+      userDoc:data,
       message:'User document fetched!'
     })
   })
@@ -54,8 +54,27 @@ const getReceivedDocs = async(req, res) => {
     if(err) return res.status(500).send({message: 'Internal server error...'})
     if(data.length === 0) return res.status(400).send({message: 'No received documents found!'})
     return res.status(200).send({
-      userDoc: data[0],
+      userDoc: data,
       message: 'Received docs fetched!'
+    })
+  })
+}
+
+
+// Get all docs according to the church
+const getAllChurchDocs = async(req, res) => {
+  if(!user) return res.status(400).send({message: 'User not found!'})
+  // Check if is the secretary
+  if(user.position !== 'Secretary') return res.status(403).send({message: 'Not authorised to perform this action! '+user.position})
+  // Get the docs
+  const sql = `SELECT * FROM documents WHERE church='${user.church}'`
+  conn.query(sql, async(err, data) => {
+    if(err) return res.status(500).send({message: 'Internal server error...'})
+    if(data.length === 0) return res.status(400).send({message: 'No documents found!'})
+    return res.status(200).send({
+      church: user.church,
+      documents: data,
+      message: 'These are the documents of '+ user.church
     })
   })
 }
@@ -63,5 +82,6 @@ const getReceivedDocs = async(req, res) => {
 module.exports = {
   deleteDoc,
   getMyDocs,
-  getReceivedDocs
+  getReceivedDocs,
+  getAllChurchDocs
 };

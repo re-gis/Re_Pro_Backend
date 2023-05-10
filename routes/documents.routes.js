@@ -1,5 +1,5 @@
 const express = require("express");
-const { deleteDoc, getMyDocs, getReceivedDocs } = require("../controllers/documents.controller");
+const { deleteDoc, getMyDocs, getReceivedDocs, getAllChurchDocs } = require("../controllers/documents.controller");
 const protect = require("../middlewares/userAuth");
 const documentRouter = express.Router();
 
@@ -11,5 +11,8 @@ documentRouter.get('/:me/docs/sent', protect, getMyDocs)
 
 // Get received documents
 documentRouter.get('/:me/docs/received', protect, getReceivedDocs)
+
+// Get all church docs
+documentRouter.get('/all/docs', protect, getAllChurchDocs)
 
 module.exports = documentRouter;

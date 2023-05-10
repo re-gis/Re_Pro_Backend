@@ -259,7 +259,7 @@ const updateUserStats = async (req, res) => {
     return res.status(401).send({ message: "User not found!" });
   }
   try {
-    const { position, church, language, idNumber, name } = req.body;
+    let { position, church, language, idNumber, name } = req.body;
     if (!position || !church || !language || !idNumber || !name) {
       return res.status(400).send({ message: "All inputs are required!" });
     } else {
