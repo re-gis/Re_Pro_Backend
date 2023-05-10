@@ -10,9 +10,8 @@ currencyRouter.post('/create', protect, createFund)
 // Get 
 currencyRouter.get('/funds', protect, getFunds)
 
-// Delete 
-currencyRouter.put('/:me/funds', protect, updateFund)
+// Update 
+currencyRouter.put('/:me/funds/', protect, updateFund)
 
-// Update
 
 module.exports = currencyRouter

@@ -12,6 +12,10 @@
     {
       "name": "documents",
       "description": "Operations about documents"
+    },
+    {
+      "name": "currency",
+      "description": "Operations about currency"
     }
   ],
   "paths": {
@@ -195,53 +199,6 @@
       }
     },
 
-    "/api/users/register/update": {
-      "put": {
-        "tags": ["users"],
-        "summary": "Update user stats",
-        "description": "Update user stats",
-        "produces": "application/json",
-        "consumes": "application/json",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": "true",
-            "properties": {
-              "position": {
-                "type": "string",
-                "example": "pastor"
-              },
-              "church": {
-                "type": "string",
-                "example": "karongi"
-              },
-              "language": {
-                "type": "string",
-                "example": "Kinyarwanda"
-              },
-              "idNumber": {
-                "type": "string",
-                "example": "345"
-              }
-            }
-          },
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "JWT access token",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User stats updated successfully"
-          }
-        }
-      }
-    },
-
     "/api/users/auth/google": {
       "get": {
         "tags": ["users"],
@@ -299,46 +256,6 @@
       }
     },
 
-    "/api/users/{user}/profile/photo/remove": {
-      "put": {
-        "tags": ["users"],
-        "summary": "Remove profile pic",
-        "description": "Removing profile pic from user identified by unique id",
-        "produces": "application/json",
-        "consumes": "application/json",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "user",
-            "description": "user name"
-          },
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "JWT access token",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "required": "true",
-            "properties": {
-              "password": {
-                "type": "string",
-                "example": "thisisapassword"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Removed profile pic"
-          }
-        }
-      }
-    },
-
     "/api/users/{user}/my/profile": {
       "get": {
         "tags": ["users"],
@@ -391,6 +308,46 @@
         "responses": {
           "200": {
             "description": "All users stats"
+          }
+        }
+      }
+    },
+
+    "/api/users/{user}/profile/photo/remove": {
+      "put": {
+        "tags": ["users"],
+        "summary": "Remove profile pic",
+        "description": "Removing profile pic from user identified by unique id",
+        "produces": "application/json",
+        "consumes": "application/json",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user",
+            "description": "user name"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": "true",
+            "properties": {
+              "password": {
+                "type": "string",
+                "example": "thisisapassword"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Removed profile pic"
           }
         }
       }
@@ -501,6 +458,53 @@
       }
     },
 
+    "/api/users/register/update": {
+      "put": {
+        "tags": ["users"],
+        "summary": "Update user stats",
+        "description": "Update user stats",
+        "produces": "application/json",
+        "consumes": "application/json",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": "true",
+            "properties": {
+              "position": {
+                "type": "string",
+                "example": "pastor"
+              },
+              "church": {
+                "type": "string",
+                "example": "karongi"
+              },
+              "language": {
+                "type": "string",
+                "example": "Kinyarwanda"
+              },
+              "idNumber": {
+                "type": "string",
+                "example": "345"
+              }
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User stats updated successfully"
+          }
+        }
+      }
+    },
+
     "/api/users/{user}/profile/delete": {
       "delete": {
         "tags": ["users"],
@@ -535,6 +539,105 @@
         "responses": {
           "200": {
             "description": "User account deleted"
+          }
+        }
+      }
+    },
+
+    "/api/currency/create": {
+      "post": {
+        "tags": ["currency"],
+        "consumes": "application/json",
+        "produces": "application/json",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "properties": {
+              "totalAmount": {
+                "type": "string",
+                "example": "123456"
+              },
+              "expenses": {
+                "type": "string",
+                "example": "1234"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created fund"
+          }
+        }
+      }
+    },
+
+    "/api/currency/funds": {
+      "get": {
+        "tags": ["currency"],
+        "consumes": "application/json",
+        "produces": "application/json",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's funds fetched"
+          }
+        }
+      }
+    },
+
+    "/api/currency/{me}/funds":{
+      "put":{
+        "tags":["currency"],
+        "consumes":"application/json",
+        "produces":"application/json",
+        "parameters":[
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "user",
+            "description": "user name"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "properties": {
+              "totalAmount": {
+                "type": "string",
+                "example": "123456"
+              },
+              "expenses": {
+                "type": "string",
+                "example": "1234"
+              }
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"User funds updated"
           }
         }
       }

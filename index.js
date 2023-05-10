@@ -82,8 +82,12 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
         console.log(err);
         return res.status(400).send({ message: "Error saving to database" });
       }
-      console.log(result);
-      res.send({ message: "File uploaded successfully" });
+      const sql = `SELECT * FROM documents WHERE reporter='${user.name}'`
+      conn.query(sql, async(err, data) => {
+        if(err) return res.status(500).send({message: 'Internal server error...'})
+        if(data.length === 0) return res.status(400).send({message:'Document not found!'})
+        res.send({ doc:data[0], message: "File uploaded successfully" });
+      })
     });
   });
 });

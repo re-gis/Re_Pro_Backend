@@ -94,6 +94,35 @@ const userRegister = async (req, res) => {
                         .status(500)
                         .send({ message: "Internal server error..." });
                     } else {
+                      const hashedPass = await bcrypt.hash(password, 10);
+                      // Save user
+                      const sql = `INSERT INTO users (email, password, number) VALUES ('${email}', '${hashedPass}', '${number}')`;
+                      conn.query(sql, async (error, data) => {
+                        if (error) {
+                          console.log(error);
+                          return res
+                            .status(500)
+                            .send({ message: "Internal server error..." });
+                        } else {
+                          // Get user
+                          const sql = `SELECT * FROM users WHERE email = '${email}' AND number = '${number}'`;
+                          conn.query(sql, (error, data) => {
+                            if (error) {
+                              console.log(error);
+                              return res.status(500).send({
+                                message: "Internal server error...",
+                              });
+                            } else {
+                              console.log(OTP);
+                              return res.status(201).send({
+                                data,
+                                token: generateToken(data[0]),
+                                message: `Code sent to ${number} verify to proceed...`,
+                              });
+                            }
+                          });
+                        }
+                      });
                       try {
                         // Send otp
                         const message = await twilio.messages.create({
@@ -230,8 +259,8 @@ const updateUserStats = async (req, res) => {
     return res.status(401).send({ message: "User not found!" });
   }
   try {
-    const { position, church, language, idNumber } = req.body;
-    if (!position || !church || !language || !idNumber) {
+    const { position, church, language, idNumber, name } = req.body;
+    if (!position || !church || !language || !idNumber || !name) {
       return res.status(400).send({ message: "All inputs are required!" });
     } else {
       // Get user to update
@@ -243,7 +272,7 @@ const updateUserStats = async (req, res) => {
           return res.status(500).send({ message: "Internal server error..." });
         } else {
           // Update user
-          const sql = `UPDATE users SET position = '${position}', church = '${church}', language = '${language}', idNumber = '${idNumber}'`;
+          const sql = `UPDATE users SET position = '${position}', church = '${church}', language = '${language}', idNumber = '${idNumber}', name='${name}' WHERE number='${user.number}' AND email='${user.email}'`;
           conn.query(sql, async (error, data) => {
             if (error) {
               console.log(error);
@@ -584,7 +613,7 @@ const profilePicRemove = async (req, res) => {
                         .status(500)
                         .send({ message: "Internal server error..." });
                     } else {
-                      return res.status(201).send({ user: data[0] });
+                      return res.status(201).send({ user: data[0], message:'Profile pic removed...' });
                     }
                   });
                 }
@@ -630,9 +659,11 @@ const getUserProfile = async (req, res) => {
 
 // Update user profile
 const updateProfile = async (req, res) => {
-  if (!user && (user.name !== req.params.user)) {
+  if (!user) {
     return res.status(401).send({ message: "User not found!" });
   }
+
+  if(user.name !== req.params.user) return res.status(400).send({message: 'Not authorised to perform this action!'})
   // Get username from url
   const userName = req.params.user;
   // compare with the token username

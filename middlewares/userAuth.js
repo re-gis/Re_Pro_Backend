@@ -19,20 +19,25 @@ const protect = async (req, res, next) => {
       token = req.headers.authorization.split(" ")[1];
 
       //Verify the token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user_id = decoded.id;
+      jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
+        if(error) return res.status(400).send({message: 'Invalid token!'})
+        const user_id = decoded.id;
 
-      // Get user from database
-      const sql = `SELECT * FROM users WHERE user_id = '${user_id}'`;
-      conn.query(sql, (error, data) => {
-        if (error) {
-          console.log(error)
-          return res.status(500).send({ message: "Internal server error..." });
-        } else {
-          user = data[0];
-          next();
-        }
+        // Get user from database
+        const sql = `SELECT * FROM users WHERE user_id = '${user_id}'`;
+        conn.query(sql, (error, data) => {
+          if (error) {
+            console.log(error);
+            return res
+              .status(500)
+              .send({ message: "Internal server error..." });
+          } else {
+            user = data[0];
+            next();
+          }
+        });
       });
+      
     } else {
       return res.json({
         message: "Not authorized",
