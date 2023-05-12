@@ -617,7 +617,7 @@
           },
           {
             "in": "path",
-            "name": "user",
+            "name": "me",
             "description": "user name"
           },
           {
