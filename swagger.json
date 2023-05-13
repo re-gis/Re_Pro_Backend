@@ -602,12 +602,12 @@
       }
     },
 
-    "/api/currency/{me}/funds":{
-      "put":{
-        "tags":["currency"],
-        "consumes":"application/json",
-        "produces":"application/json",
-        "parameters":[
+    "/api/currency/{me}/funds": {
+      "put": {
+        "tags": ["currency"],
+        "consumes": "application/json",
+        "produces": "application/json",
+        "parameters": [
           {
             "name": "Authorization",
             "in": "header",
@@ -635,9 +635,54 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "User funds updated"
+          }
+        }
+      }
+    },
+
+    "/api/docs/{user}/create": {
+      "post": {
+        "tags": ["documents"],
+        "consumes": "application/json",
+        "produces": "application/json",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user",
+            "description": "user name"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "properties": {
+              "title": {
+                "type": "string",
+                "example": "123456"
+              },
+              "description": {
+                "type": "string",
+                "example": "1234"
+              },
+              "file": {
+                "type": "file",
+                "example": "1234"
+              }
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses":{
           "200":{
-            "description":"User funds updated"
+            "description": "Document created"
           }
         }
       }

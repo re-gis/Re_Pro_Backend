@@ -15,3 +15,6 @@ currencyRouter.put('/:me/funds/', protect, updateFund)
 
 
 module.exports = currencyRouter
+
+
+
