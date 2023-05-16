@@ -549,6 +549,7 @@
         "tags": ["currency"],
         "consumes": "application/json",
         "produces": "application/json",
+        "summary": "Create a fund",
         "parameters": [
           {
             "name": "Authorization",
@@ -585,6 +586,7 @@
         "tags": ["currency"],
         "consumes": "application/json",
         "produces": "application/json",
+        "summary": "Get all funds",
         "parameters": [
           {
             "name": "Authorization",
@@ -607,6 +609,8 @@
         "tags": ["currency"],
         "consumes": "application/json",
         "produces": "application/json",
+        "description": "Get my funds",
+        "summary": "get my funds",
         "parameters": [
           {
             "name": "Authorization",
@@ -648,6 +652,7 @@
         "tags": ["documents"],
         "consumes": "application/json",
         "produces": "application/json",
+        "summary": "Upload a doc",
         "parameters": [
           {
             "in": "path",
@@ -655,22 +660,38 @@
             "description": "user name"
           },
           {
-            "in": "body",
-            "name": "body",
-            "properties": {
-              "title": {
-                "type": "string",
-                "example": "123456"
-              },
-              "description": {
-                "type": "string",
-                "example": "1234"
-              },
-              "file": {
-                "type": "file",
-                "example": "1234"
-              }
-            }
+            "in": "formData",
+            "name": "receiver",
+            "type": "string",
+            "required": "true"
+          },
+          {
+            "in": "formData",
+            "name": "details",
+            "type": "string",
+            "required": "true",
+            "example": "These are the reports"
+          },
+          {
+            "in": "formData",
+            "name": "church",
+            "type": "string",
+            "required": "true",
+            "example": "Kigali"
+          },
+          {
+            "in": "formData",
+            "name": "subject",
+            "type": "string",
+            "required": "true",
+            "example": "reports"
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "The document file to upload",
+            "required": true,
+            "type": "file"
           },
           {
             "name": "Authorization",
@@ -680,9 +701,130 @@
             "type": "string"
           }
         ],
-        "responses":{
-          "200":{
+        "responses": {
+          "200": {
             "description": "Document created"
+          }
+        }
+      }
+    },
+
+    "/api/docs/{me}/docs/sent": {
+      "get": {
+        "tags": ["documents"],
+        "consumes": "application/json",
+        "produces": "application/json",
+        "summary": "Get my sent docs",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "me",
+            "description": "user name"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "These are your docs"
+          }
+        }
+      }
+    },
+    "/api/docs/{me}/docs/received": {
+      "get": {
+        "tags": ["documents"],
+        "consumes": "application/json",
+        "produces": "application/json",
+        "summary": "Get my sent docs",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "me",
+            "description": "user name"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "These are your docs"
+          }
+        }
+      }
+    },
+
+    "/api/docs/all/docs": {
+      "get": {
+        "tags": ["documents"],
+        "consumes": "application/json",
+        "produces": "application/json",
+        "summary": "Get all church docs",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "getting all church docs"
+          }
+        }
+      }
+    },
+
+    "/api/docs/{user}/doc/{id}/delete": {
+      "delete": {
+        "tags": ["documents"],
+        "consumes": "application/json",
+        "produces": "application/json",
+        "summary": "Delete a document",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Doc id"
+          },
+          {
+            "in": "path",
+            "name": "user",
+            "description": "user name"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "properties": {
+              "password": {
+                "type": "string",
+                "example": "irumvaregis"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The document is deleted"
           }
         }
       }

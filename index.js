@@ -54,17 +54,16 @@ const upload = multer({ storage: storage }).single("file");
 
 app.post("/api/docs/:user/create", protect, (req, res) => {
   if (!user) return res.status(400).send({ message: "User not found!" });
-
   if (user.name !== req.params.user)
-  return res.status(404).send({ message: "Cannot perform this action!" });
+    return res.status(404).send({ message: "Cannot perform this action!" });
   // upload a word document
-  
+
   upload(req, res, (err) => {
     if (err) {
       console.log(err);
       return res.status(400).send({ message: "Error uploading file" });
     }
-    
+
     // Save the link to database
     const path = __dirname + "\\" + req.file.path;
     const receiver = req.body.receiver;
@@ -73,7 +72,7 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
     const subject = req.body.subject;
     const doc_name = Date.now() + req.file.originalname;
     const church = req.body.church;
-    
+
     // console.log({path, receiver, reporter, details, subject})
     // save to database
     const sql = `INSERT INTO documents (receiver, reporter, details, subject, path, doc_name, church) VALUES ('${receiver}', '${reporter}', '${details}', '${subject}', '${path}', '${doc_name}', '${church}')`;
@@ -85,9 +84,9 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
       const sql = `SELECT * FROM documents WHERE reporter='${user.name}'`;
       conn.query(sql, async (err, data) => {
         if (err)
-        return res.status(500).send({ message: "Internal server error..." });
+          return res.status(500).send({ message: "Internal server error..." });
         if (data.length === 0)
-        return res.status(400).send({ message: "Document not found!" });
+          return res.status(400).send({ message: "Document not found!" });
         res.send({ doc: data, message: "File uploaded successfully" });
       });
     });
@@ -105,8 +104,8 @@ app.use(
     useTempFiles: true,
     tempFileDir: "/tmp/",
   })
-  );
-  
+);
+
 // user apis
 app.use("/api/users", userRouter);
 
