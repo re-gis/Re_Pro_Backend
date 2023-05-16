@@ -1,88 +1,62 @@
-const ChatRoom = require("../models/ChatRoom/chat.room.model");
+// const { Chat } = require("../models/chat.Model");
 
-// Create chatroom
-const createRoom = async (rq, rs) => {
-  if (!user) return rs.status(401).send({ message: "User not found!" });
+const Chat = require("../models/chat.Model");
+
+const accessChat = async (req, res) => {
+  const { userNum } = req.body;
+  if (!userNum) return res.status(400).send({ message: "No user number!" });
+  let isChat = await Chat.find({
+    isGroupChat: false,
+    $and: [
+      { users: { $elemMatch: { $eq: user.number } } },
+      { users: { $elemMatch: { $eq: userNum } } },
+    ],
+  });
+
+  if (isChat.length === 0) {
+    const name = user.name;
+    // Create a new chat
+    const newChat = new Chat({
+      users: [user.number, userNum],
+      groupAdmin: user.number,
+    });
+    await newChat.save();
+    isChat = newChat;
+    return res.status(200).send({ chat: isChat });
+  }
+
+  return res.status(200).send({ chat: isChat });
+};
+
+const fetchChats = async (req, res) => {
   try {
-    const { name } = rq.body;
-    if (!name)
-      return rs.status(400).send({ message: "Chatroom name is required" });
-    const createdBy = user.name;
-    // Check if the name is available
-    const chatName = await ChatRoom.findOne({ name });
+    const chats = await Chat.find({
+      users: { $elemMatch: { $eq: user.number } },
+    }).sort({ updatedAt: -1 });
 
-    if (chatName)
-      return rs.status(400).send({ message: "Chat room name not available!" });
-    const newRoom = await ChatRoom.create({ name, createdBy });
-    const roomId = newRoom._id;
+    if (chats.length === 0)
+      return res.status(400).send({ message: "No chats found!" });
 
-    const message = "Chat room created successfully.";
-    return rs.status(201).json({ roomId, message });
+    return res.status(200).send(chats);
   } catch (error) {
     console.log(error);
-    return rs.status(500).send({ message: "Error creating room" });
+    return res.status(500).send({ message: "Internal server error..." });
   }
 };
 
-// Get all rooms available
-const getRooms = async (rq, rs) => {
-  if (!user) return rs.status(400).send({ message: "User not found!" });
-  const rooms = await ChatRoom.find();
-  if (!rooms)
-    return rs.status(400).send({ message: "No chatrooms available..." });
-  rs.status(200).send({ rooms });
-};
+const createGroupChat = async (req, res) => {};
 
-const getRoomById = async (rq, rs) => {
-  const roomId = rq.params.id;
-  // get room
-  const room = await ChatRoom.findById(rq.params.id);
-  if (!room)
-    return rs.status(400).send({ message: "Room " + roomId + " not found!" });
-  return rs.status(200).send({
-    chatRoom: room,
-    message: "Chat room fetched...",
-  });
-};
+const renameGroup = async (req, res) => {};
 
-// et my chat rooms
-const getMyRooms = async (req, res) => {
-  if (!user) return res.status(400).send({ message: "User not found!" });
-  if (user.name !== req.params.me)
-    return res
-      .status(400)
-      .send({ message: "Not authorised to perform this action!" });
-  // Get user's rooms
-  const myRooms = await ChatRoom.find({ createdBy: user.name });
-  if (!myRooms) return res.status(400).send({ message: "No chatrooms found!" });
-  return res
-    .status(200)
-    .send({ myChatrooms: myRooms, message: "These are my chat rooms..." });
-};
+const removeFromGroup = async (req, res) => {};
 
-const joinRoom = async (rq, rs) => {
-  // const 
-};
-
-const leaveRoom = async (rq, rs) => {
-  console.log("Leave room");
-};
-
-const getRoomMessages = async (rq, rs) => {
-  console.log("Get room messages");
-};
-
-const sendMessage = async (rq, rs) => {
-  console.log("Send message");
-};
+const addToGroup = async (req, res) => {};
 
 module.exports = {
-  createRoom,
-  getRooms,
-  getRoomById,
-  joinRoom,
-  leaveRoom,
-  getRoomMessages,
-  sendMessage,
-  getMyRooms,
+  accessChat,
+  renameGroup,
+  addToGroup,
+  fetchChats,
+  createGroupChat,
+  removeFromGroup,
 };

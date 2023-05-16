@@ -20,7 +20,7 @@ const protect = async (req, res, next) => {
 
       //Verify the token
       jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
-        if(error) return res.status(400).send({message: 'Invalid token!'})
+        if (error) return res.status(400).send({ message: "Invalid token!" });
         const user_id = decoded.id;
 
         // Get user from database
@@ -37,7 +37,6 @@ const protect = async (req, res, next) => {
           }
         });
       });
-      
     } else {
       return res.json({
         message: "Not authorized",

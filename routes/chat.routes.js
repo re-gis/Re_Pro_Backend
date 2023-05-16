@@ -1,39 +1,13 @@
-const express = require("express");
-const chatRouter = express.Router();
-const {
-  createRoom,
-  getRooms,
-  getRoomById,
-  joinRoom,
-  leaveRoom,
-  getRoomMessages,
-  sendMessage,
-  getMyRooms,
-} = require("../controllers/chat.controllers");
-const protect = require("../middlewares/userAuth");
+const express = require('express');
+const protect = require('../middlewares/userAuth');
+const { accessChat, fetchChats, createGroupChat, renameGroup, removeFromGroup, addToGroup } = require('../controllers/chat.controllers');
+const chatRouter = express.Router()
 
-// create room
-chatRouter.post("/room/create", protect, createRoom);
+chatRouter.route("/").post(protect, accessChat);
+chatRouter.route("/").get(protect, fetchChats);
+chatRouter.route("/group").post(protect, createGroupChat);
+chatRouter.route("/rename").put(protect, renameGroup);
+chatRouter.route("/remove").delete(protect, removeFromGroup);
+chatRouter.route("/groupadd").put(protect, addToGroup);
 
-// get rooms
-chatRouter.get("/rooms", protect, getRooms);
-
-// get room by id
-chatRouter.get("/room/:id", getRoomById);
-
-// get my rooms
-chatRouter.get('/:me/rooms', protect, getMyRooms)
-
-// join room
-chatRouter.post("/room/:id/join", joinRoom);
-
-// leave room
-chatRouter.post("/room/:id/leave", leaveRoom);
-
-// get room messages
-chatRouter.get("/room/:id/messages", getRoomMessages);
-
-// send message
-chatRouter.post("/room/:id/message", sendMessage);
-
-module.exports = chatRouter;
+module.exports = chatRouter
