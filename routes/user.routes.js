@@ -15,6 +15,7 @@ const {
   getTotalWorkers,
   getPastors,
   passwordChange,
+  searchUser,
 } = require("../controllers/user.Controllers");
 const userRouter = express.Router();
 const passport = require("passport");
@@ -85,5 +86,8 @@ userRouter.get("/workers/pastors", getPastors);
 
 // Change user password
 userRouter.put("/:user/profile/password/change", protect, passwordChange);
+
+// Search user
+userRouter.post("/search", protect, searchUser);
 
 module.exports = userRouter;
