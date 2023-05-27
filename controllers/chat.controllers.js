@@ -1,4 +1,12 @@
+const mysql = require("mysql");
+
 // const { Chat } = require("../models/chat.Model");
+const conn = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "re_pro",
+});
 
 const Chat = require("../models/chat.Model");
 
@@ -44,7 +52,38 @@ const fetchChats = async (req, res) => {
   }
 };
 
-const createGroupChat = async (req, res) => {};
+const createGroupChat = async (req, res) => {
+  try {
+    if (!req.body.users || !req.body.name)
+      return res.status(403).send({ message: "All inputs are required!" });
+    let { name, users } = req.body;
+    if (users.length <= 2)
+      return res.status(403).send({
+        message: "More than two members are required to form a group chat!",
+      });
+    // check if the users are available
+    let notFoundUsers = []
+    for (let i = 0; i < users.length; i++) {
+      const sql = `SELECT * FROM users WHERE number = '${users[i]}'`;
+      conn.query(sql, async (err, data) => {
+        if (err) {
+
+          return res.status(500).send({ message: "Internal server error..." });
+        } else {
+
+          if (data.length === 0) {
+            
+          } else {
+            // console.log(users[i]);
+          }
+        } 
+      });
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const renameGroup = async (req, res) => {};
 

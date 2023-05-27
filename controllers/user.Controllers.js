@@ -875,6 +875,10 @@ const searchUser = async (req, res) => {
   }
 };
 
+
+
+
+
 module.exports = {
   userRegister,
   verifyOtp,
