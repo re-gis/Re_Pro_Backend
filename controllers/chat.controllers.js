@@ -61,25 +61,20 @@ const createGroupChat = async (req, res) => {
       return res.status(403).send({
         message: "More than two members are required to form a group chat!",
       });
-    // check if the users are available
-    let notFoundUsers = []
-    for (let i = 0; i < users.length; i++) {
-      const sql = `SELECT * FROM users WHERE number = '${users[i]}'`;
-      conn.query(sql, async (err, data) => {
-        if (err) {
 
-          return res.status(500).send({ message: "Internal server error..." });
-        } else {
-
-          if (data.length === 0) {
-            
-          } else {
-            // console.log(users[i]);
-          }
-        } 
-      });
-    }
-
+    const grpValid = await Chat.findOne({ name });
+    if (!grpValid) {return res.status({ message: "Group name taken!" })};
+    // Create chat group
+    users.push(user.number);
+    const group = await Chat.create({
+      chatName: name,
+      users: users,
+      isGroupChat: true,
+      groupAdmin: user.number,
+    });
+    if (!group)
+      return res.status(500).send({ message: "Internal server error..." });
+    return res.status(201).send({ message: "Chat created!", chat: group });
   } catch (error) {
     console.log(error);
   }

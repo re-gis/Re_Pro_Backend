@@ -115,6 +115,10 @@ app.use("/api/currency", currencyRouter);
 // Room chat apis
 app.use("/api/chat", require("./routes/chat.routes"));
 
+// app.get('/', (req, res) => {
+//   res.
+// })
+
 const server = app.listen(process.env.PORT, () => {
   console.log(`server listening port ${process.env.PORT}`);
 });
