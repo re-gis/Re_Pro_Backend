@@ -25,6 +25,14 @@ const conn = mysql.createConnection({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// Fileuploader
+app.use(
+  fileUploader({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
+
 // Connect database
 connectDatabase(); // MongoDB
 connectDB(); // MySQL
@@ -93,18 +101,29 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
   });
 });
 
+/* ----------------------------------------------------------- */
+
+/* Download the document */
+app.get("/api/docs/:user/doc/:id/download", protect, (req, res) => {
+  const sql = `SELECT * FROM documents WHERE id='${req.params.id}'`;
+  conn.query(sql, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(400).send({ message: "Error downloading file" });
+    }
+    if (result.length === 0)
+      return res.status(400).send({ message: "Document not found!" });
+    const path = result[0].path;
+    return res.status(201).download(path);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+
 app.use("/api/docs", documentRouter);
 
 // Use cors
 app.use(cors());
-
-// Fileuploader
-app.use(
-  fileUploader({
-    useTempFiles: true,
-    tempFileDir: "/tmp/",
-  })
-);
 
 // user apis
 app.use("/api/users", userRouter);
@@ -114,10 +133,6 @@ app.use("/api/currency", currencyRouter);
 
 // Room chat apis
 app.use("/api/chat", require("./routes/chat.routes"));
-
-// app.get('/', (req, res) => {
-//   res.
-// })
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`server listening port ${process.env.PORT}`);

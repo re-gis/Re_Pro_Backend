@@ -20,4 +20,5 @@ documentRouter.get("/:me/docs/received", protect, getReceivedDocs);
 // Get all church docs
 documentRouter.get("/all/docs", protect, getAllChurchDocs);
 
+
 module.exports = documentRouter;
