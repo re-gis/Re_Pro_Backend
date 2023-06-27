@@ -4,10 +4,11 @@ const connectDB = async () => {
   try {
     const conn = mysql.createConnection(
       {
-        host: "localhost",
-        user: "root",
-        password: "",
-        database: "re_pro",
+        host: "sql8.freesqldatabase.com",
+        user: "sql8628661",
+        password: "gZN1nxK1DC",
+        database: "sql8628661",
+        port: "3306",
       },
 
       console.log("MySQL database connected...")
