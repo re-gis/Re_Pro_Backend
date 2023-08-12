@@ -65,7 +65,7 @@ const userRegister = async (req, res) => {
                 upperCaseAlphabets: false,
                 specialChars: false,
               });
-              console.log(OTP);
+              // console.log(OTP);
 
               // Hash otp
               const hashedOtp = await bcrypt.hash(OTP, 10);
@@ -74,7 +74,7 @@ const userRegister = async (req, res) => {
               const sql = `SELECT * FROM otps WHERE number = '${number}'`;
               conn.query(sql, async (error, data) => {
                 if (error) {
-                  console.log(error);
+                  // console.log(error);
                   return res
                     .status(500)
                     .send({ message: "Internal server error..." });
@@ -270,7 +270,7 @@ const updateUserStats = async (req, res) => {
           return res.status(500).send({ message: "Internal server error..." });
         } else {
           // Update user
-          const sql = `UPDATE users SET position = '${position}', church = '${church}', language = '${language}', idNumber = '${idNumber}', name='${name}' WHERE number='${user.number}' AND email='${user.email}'`;
+          const sql = `UPDATE users SET position = '${position.toLowerCase()}', church = '${church}', language = '${language}', idNumber = '${idNumber}', name='${name}' WHERE number='${user.number}' AND email='${user.email}'`;
           conn.query(sql, async (error, data) => {
             if (error) {
               console.log(error);
@@ -695,7 +695,7 @@ const updateProfile = async (req, res) => {
         .send({ message: "Confirm password to proceed..." });
     } else {
       // Update the user profile
-      const sql = `UPDATE users SET name = '${newUsername}', email='${newEmail}' , number='${newNumber}' , church ='${church}', position='${newposition}' WHERE name = '${user.name}' AND number='${user.number}'`;
+      const sql = `UPDATE users SET name = '${newUsername}', email='${newEmail}' , number='${newNumber}' , church ='${church}', position='${newposition.toLowerCase()}' WHERE name = '${user.name}' AND number='${user.number}'`;
       conn.query(sql, async (error) => {
         if (error) {
           console.log(error);

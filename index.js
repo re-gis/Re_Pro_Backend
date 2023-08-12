@@ -72,6 +72,11 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
       return res.status(400).send({ message: "Error uploading file" });
     }
 
+    if (!req.file) {
+      return res.status(403).send({
+        message: "Please select a document to upload",
+      });
+    }
     // Save the link to database
     const path = __dirname + "\\" + req.file.path;
     const receiver = req.body.receiver;
@@ -83,7 +88,23 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
 
     // console.log({path, receiver, reporter, details, subject})
     // save to database
-    const sql = `INSERT INTO documents (receiver, reporter, details, subject, path, doc_name, church) VALUES ('${receiver}', '${reporter}', '${details}', '${subject}', '${path}', '${doc_name}', '${church}')`;
+    const sql = `INSERT INTO documents (
+      receiver, 
+      reporter, 
+      details, 
+      subject, 
+      path, 
+      doc_name, 
+      church
+      ) VALUES (
+        '${receiver}', 
+        '${reporter}', 
+        '${details}', 
+        '${subject}', 
+        '${path}', 
+        '${doc_name}', 
+        '${church}'
+        )`;
     conn.query(sql, (err, result) => {
       if (err) {
         console.log(err);
