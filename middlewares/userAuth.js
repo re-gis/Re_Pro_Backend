@@ -24,7 +24,19 @@ const protect = async (req, res, next) => {
         const user_id = decoded.id;
 
         // Get user from database
-        const sql = `SELECT * FROM users WHERE user_id = '${user_id}'`;
+        const sql = `SELECT 
+        user_id, 
+        email, 
+        name, 
+        number, 
+        profilePic, 
+        cloudinaryId, 
+        church, 
+        language, 
+        verified, 
+        position, 
+        idNumber 
+        FROM users WHERE user_id = '${user_id}'`;
         conn.query(sql, (error, data) => {
           if (error) {
             console.log(error);
