@@ -51,9 +51,7 @@ const userRegister = async (req, res) => {
         conn.query(sql, async (error, data) => {
           if (error) {
             console.log(error);
-            return res
-              .status(500)
-              .send({ message: "Internal server error..." });
+            return res.status(500).send({ message: "Internal server error.." });
           } else {
             if (data.length !== 0) {
               return res.status(400).send({ message: "User already exists!" });
@@ -92,6 +90,49 @@ const userRegister = async (req, res) => {
                         .status(500)
                         .send({ message: "Internal server error..." });
                     } else {
+                      // Send otp
+                      const message = await twilio.messages.create({
+                        from: "+12765985304",
+                        to: number,
+                        body: `Your Verification Code is ${OTP}`,
+                      });
+
+                      if (!message) {
+                        console.log(error);
+                        return res
+                          .status(500)
+                          .send({ message: "Internal server error..." });
+                      } else {
+                        const hashedPass = await bcrypt.hash(password, 10);
+                        // Save user
+                        const sql = `INSERT INTO users (email, password, number) VALUES ('${email}', '${hashedPass}', '${number}')`;
+                        conn.query(sql, async (error, data) => {
+                          if (error) {
+                            console.log(error);
+                            return res
+                              .status(500)
+                              .send({ message: "Internal server error..." });
+                          } else {
+                            // Get user
+                            const sql = `SELECT * FROM users WHERE email = '${email}' AND number = '${number}'`;
+                            conn.query(sql, (error, data) => {
+                              if (error) {
+                                console.log(error);
+                                return res.status(500).send({
+                                  message: "Internal server error...",
+                                });
+                              } else {
+                                console.log(OTP);
+                                return res.status(201).send({
+                                  data,
+                                  token: generateToken(data[0]),
+                                  message: `Code sent to ${number} verify to proceed...`,
+                                });
+                              }
+                            });
+                          }
+                        });
+                      }
                       const hashedPass = await bcrypt.hash(password, 10);
                       // Save user
                       const sql = `INSERT INTO users (email, password, number) VALUES ('${email}', '${hashedPass}', '${number}')`;
@@ -121,56 +162,6 @@ const userRegister = async (req, res) => {
                           });
                         }
                       });
-                      try {
-                        // Send otp
-                        const message = await twilio.messages.create({
-                          from: "+12765985304",
-                          to: number,
-                          body: `Your Verification Code is ${OTP}`,
-                        });
-
-                        if (!message) {
-                          console.log(error);
-                          return res
-                            .status(500)
-                            .send({ message: "Internal server error..." });
-                        } else {
-                          const hashedPass = await bcrypt.hash(password, 10);
-                          // Save user
-                          const sql = `INSERT INTO users (email, password, number) VALUES ('${email}', '${hashedPass}', '${number}')`;
-                          conn.query(sql, async (error, data) => {
-                            if (error) {
-                              console.log(error);
-                              return res
-                                .status(500)
-                                .send({ message: "Internal server error..." });
-                            } else {
-                              // Get user
-                              const sql = `SELECT * FROM users WHERE email = '${email}' AND number = '${number}'`;
-                              conn.query(sql, (error, data) => {
-                                if (error) {
-                                  console.log(error);
-                                  return res.status(500).send({
-                                    message: "Internal server error...",
-                                  });
-                                } else {
-                                  console.log(OTP);
-                                  return res.status(201).send({
-                                    data,
-                                    token: generateToken(data[0]),
-                                    message: `Code sent to ${number} verify to proceed...`,
-                                  });
-                                }
-                              });
-                            }
-                          });
-                        }
-                      } catch (error) {
-                        console.log(error);
-                        return res
-                          .status(500)
-                          .send({ message: "Internal server error..." });
-                      }
                     }
                   });
                 }

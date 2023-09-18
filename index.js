@@ -14,6 +14,7 @@ const protect = require("./middlewares/userAuth");
 const documentRouter = require("./routes/documents.routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
+const path = require('path')
 
 const conn = mysql.createConnection({
   host: "localhost",
@@ -78,7 +79,7 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
       });
     }
     // Save the link to database
-    const path = __dirname + "\\" + req.file.path;
+    const path = path.join(__dirname, req.file.path);
     const receiver = req.body.receiver;
     const reporter = req.params.user;
     const details = req.body.details;
@@ -135,7 +136,7 @@ app.get("/api/docs/:user/doc/:id/download", protect, (req, res) => {
     if (result.length === 0)
       return res.status(400).send({ message: "Document not found!" });
     const path = result[0].path;
-    return res.status(201).download(path);
+    return res.status(200).download(path);
   });
 });
 
