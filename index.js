@@ -14,7 +14,7 @@ const protect = require("./middlewares/userAuth");
 const documentRouter = require("./routes/documents.routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
-const path = require('path')
+const path = require("path");
 
 const conn = mysql.createConnection({
   host: "localhost",
@@ -60,17 +60,16 @@ const storage = multer.diskStorage({
 
 // Upload a document
 const upload = multer({ storage: storage }).single("file");
+app.post("/api/docs/:user/create", upload, async (req, res) => {
+  try {
+    const user = req.params.user; // Make sure this is what you intend.
 
-app.post("/api/docs/:user/create", protect, (req, res) => {
-  if (!user) return res.status(400).send({ message: "User not found!" });
-  if (user.name !== req.params.user)
-    return res.status(404).send({ message: "Cannot perform this action!" });
-  // upload a word document
+    if (!user) {
+      return res.status(400).send({ message: "User not found!" });
+    }
 
-  upload(req, res, (err) => {
-    if (err) {
-      console.log(err);
-      return res.status(400).send({ message: "Error uploading file" });
+    if (user !== req.params.user) {
+      return res.status(404).send({ message: "Cannot perform this action!" });
     }
 
     if (!req.file) {
@@ -78,17 +77,11 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
         message: "Please select a document to upload",
       });
     }
-    // Save the link to database
-    const path = path.join(__dirname, req.file.path);
-    const receiver = req.body.receiver;
-    const reporter = req.params.user;
-    const details = req.body.details;
-    const subject = req.body.subject;
-    const doc_name = Date.now() + req.file.originalname;
-    const church = req.body.church;
 
-    // console.log({path, receiver, reporter, details, subject})
-    // save to database
+    // Save the link to database
+    const docPath = path.join(__dirname, "uploads", req.file.filename);
+    const { receiver, details, subject, church } = req.body;
+
     const sql = `INSERT INTO documents (
       receiver, 
       reporter, 
@@ -97,22 +90,23 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
       path, 
       doc_name, 
       church
-      ) VALUES (
-        '${receiver}', 
-        '${reporter}', 
-        '${details}', 
-        '${subject}', 
-        '${path}', 
-        '${doc_name}', 
-        '${church}'
-        )`;
+    ) VALUES (
+      '${receiver}', 
+      '${user}', 
+      '${details}', 
+      '${subject}', 
+      '${docPath}', 
+      '${req.file.filename}', 
+      '${church}'
+    )`;
+
     conn.query(sql, (err, result) => {
       if (err) {
         console.log(err);
         return res.status(400).send({ message: "Error saving to database" });
       }
-      const sql = `SELECT * FROM documents WHERE reporter='${user.name}'`;
-      conn.query(sql, async (err, data) => {
+      const query = `SELECT * FROM documents WHERE reporter='${user}'`;
+      conn.query(query, (err, data) => {
         if (err)
           return res.status(500).send({ message: "Internal server error..." });
         if (data.length === 0)
@@ -120,7 +114,10 @@ app.post("/api/docs/:user/create", protect, (req, res) => {
         res.send({ doc: data, message: "File uploaded successfully" });
       });
     });
-  });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: "Internal server error..." });
+  }
 });
 
 /* ----------------------------------------------------------- */

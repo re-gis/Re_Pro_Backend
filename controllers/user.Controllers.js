@@ -311,6 +311,7 @@ const loginUser = async (req, res) => {
       const sql = `SELECT * FROM users WHERE email = '${email}'`;
       conn.query(sql, async (error, data) => {
         if (error) {
+          console.log(error)
           return res.status(500).send({ message: "Internal server error..." });
         } else {
           if (data.length === 0) {
