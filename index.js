@@ -15,6 +15,7 @@ const documentRouter = require("./routes/documents.routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 const path = require("path");
+const fs = require("fs");
 
 const conn = mysql.createConnection({
   host: "localhost",
@@ -25,6 +26,9 @@ const conn = mysql.createConnection({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// static files
+app.use("/uploads", express.static("uploads"));
 
 // Fileuploader
 app.use(
@@ -188,6 +192,15 @@ io.on("connection", (socket) => {
     chat.users.forEach((user) => {
       if (user._id === newMsgReceived.sender._id) return;
       socket.in(user._id).emit("message received", newMsgReceived);
+    });
+
+    socket.on("file", (data) => {
+      const fileBuffer = Buffer.from(data.file.data);
+      const filename = Date.now() + "-" + data.file.name;
+
+      fs.writeFileSync("./uploads/" + filename, fileBuffer);
+      socket.emit("file-uploaded", { url: `/uploads/${filename}` });
+      socket.emit("new-file-message", { url: `/uploads/${filename}` });
     });
 
     socket.off("setup", (userData) => {
