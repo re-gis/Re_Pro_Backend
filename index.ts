@@ -23,14 +23,22 @@ import { createConnection } from "typeorm";
 // });
 
 // Postgres
-createConnection()
-  .then((conn) => {
-    console.log("Connected successfully to postgres...");
-  })
-  .catch((e) => {
-    console.log(e);
-  });
+const connectionUrl =
+  "postgres://merci:6OLP6t3tLKfsY5pAcbi1b4Tq9mTb7zrp@dpg-cleteurl00ks739tmgd0-a.oregon-postgres.render.com/re_pro";
 
+createConnection({
+  type: "postgres",
+  url: connectionUrl,
+  synchronize: true,
+  logging: true,
+  entities: ["dist/entities/*.js"],
+})
+  .then((conn) => {
+    console.log("Connected successfully to PostgreSQL...");
+  })
+  .catch((error) => {
+    console.error("Error connecting to PostgreSQL:", error);
+  });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 

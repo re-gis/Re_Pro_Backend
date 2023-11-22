@@ -20,12 +20,19 @@ const typeorm_1 = require("typeorm");
 //   database: "re_pro",
 // });
 // Postgres
-(0, typeorm_1.createConnection)()
-    .then((conn) => {
-    console.log("Connected successfully to postgres...");
+const connectionUrl = "postgres://merci:6OLP6t3tLKfsY5pAcbi1b4Tq9mTb7zrp@dpg-cleteurl00ks739tmgd0-a.oregon-postgres.render.com/re_pro";
+(0, typeorm_1.createConnection)({
+    type: "postgres",
+    url: connectionUrl,
+    synchronize: true,
+    logging: true,
+    entities: ["dist/entities/*.js"],
 })
-    .catch((e) => {
-    console.log(e);
+    .then((conn) => {
+    console.log("Connected successfully to PostgreSQL...");
+})
+    .catch((error) => {
+    console.error("Error connecting to PostgreSQL:", error);
 });
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
