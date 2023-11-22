@@ -13,27 +13,26 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const fs_1 = __importDefault(require("fs"));
 const user_routes_1 = require("./routes/user.routes");
 const typeorm_1 = require("typeorm");
-// const conn = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "re_pro",
-// });
+const db_1 = require("./config/mongodb/db");
 // Postgres
-const connectionUrl = "postgres://merci:6OLP6t3tLKfsY5pAcbi1b4Tq9mTb7zrp@dpg-cleteurl00ks739tmgd0-a.oregon-postgres.render.com/re_pro";
-(0, typeorm_1.createConnection)({
-    type: "postgres",
-    url: connectionUrl,
-    synchronize: true,
-    logging: true,
-    entities: ["dist/entities/*.js"],
-})
-    .then((conn) => {
-    console.log("Connected successfully to PostgreSQL...");
-})
-    .catch((error) => {
-    console.error("Error connecting to PostgreSQL:", error);
-});
+// const connectionUrl =
+//   "postgres://merci:6OLP6t3tLKfsY5pAcbi1b4Tq9mTb7zrp@dpg-cleteurl00ks739tmgd0-a.oregon-postgres.render.com/re_pro";
+// createConnection({
+//   type: "postgres",
+//   url: connectionUrl,
+//   synchronize: true,
+//   logging: true,
+//   entities: ["dist/entities/*.js"],
+// })
+//   .then((conn) => {
+//     console.log("Connected successfully to PostgreSQL...");
+//   })
+//   .catch((error) => {
+//     console.error("Error connecting to PostgreSQL:", error);
+//   });
+(0, typeorm_1.createConnection)()
+    .then((con) => console.log("Postgres connected successfully!"))
+    .catch((e) => console.log(e));
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 // static files
@@ -44,7 +43,7 @@ app.use((0, express_fileupload_1.default)({
     tempFileDir: "/tmp/",
 }));
 // Connect database
-// connectDatabase(); // MongoDB
+(0, db_1.connectDatabase)(); // MongoDB
 // connectDB(); // MySQL
 // Swagger documentation
 // app.use("/documentation", swaggerUi.serve, swaggerUi.setup());

@@ -6,39 +6,32 @@ import swaggerUi from "swagger-ui-express";
 import fileUploader from "express-fileupload";
 import cors from "cors";
 import bodyParser from "body-parser";
-import path from "path";
 import fs from "fs";
-import multer from "multer";
-import IRequest from "./interfaces/IRequest";
-import IResponse from "./interfaces/IResponse";
 import { Socket } from "socket.io";
 import { userRouter } from "./routes/user.routes";
 import { createConnection } from "typeorm";
-
-// const conn = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "re_pro",
-// });
-
+import { connectDatabase } from "./config/mongodb/db";
 // Postgres
-const connectionUrl =
-  "postgres://merci:6OLP6t3tLKfsY5pAcbi1b4Tq9mTb7zrp@dpg-cleteurl00ks739tmgd0-a.oregon-postgres.render.com/re_pro";
+// const connectionUrl =
+//   "postgres://merci:6OLP6t3tLKfsY5pAcbi1b4Tq9mTb7zrp@dpg-cleteurl00ks739tmgd0-a.oregon-postgres.render.com/re_pro";
 
-createConnection({
-  type: "postgres",
-  url: connectionUrl,
-  synchronize: true,
-  logging: true,
-  entities: ["dist/entities/*.js"],
-})
-  .then((conn) => {
-    console.log("Connected successfully to PostgreSQL...");
-  })
-  .catch((error) => {
-    console.error("Error connecting to PostgreSQL:", error);
-  });
+// createConnection({
+//   type: "postgres",
+//   url: connectionUrl,
+//   synchronize: true,
+//   logging: true,
+//   entities: ["dist/entities/*.js"],
+// })
+//   .then((conn) => {
+//     console.log("Connected successfully to PostgreSQL...");
+//   })
+//   .catch((error) => {
+//     console.error("Error connecting to PostgreSQL:", error);
+//   });
+
+createConnection()
+  .then((con) => console.log("Postgres connected successfully!"))
+  .catch((e) => console.log(e));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -54,7 +47,8 @@ app.use(
 );
 
 // Connect database
-// connectDatabase(); // MongoDB
+
+connectDatabase()// MongoDB
 // connectDB(); // MySQL
 
 // Swagger documentation
@@ -64,21 +58,9 @@ app.use(
 /* Upload a document
    ----------------- */
 
-// Multer
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "./uploads");
-//   },
-//   filename: function (req, file, cb) {
-//     const ext = file.originalname.split(".");
-//     const e = ext[ext.length - 1];
-//     // console.log(ext[ext.length-1])
-//     cb(null, `${file.originalname}.${e}`);
-//   },
-// });
+
 
 // // Upload a document
-// const upload = multer({ storage: storage }).single("file");
 // app.post("/api/docs/:user/create", upload, async (req:IRequest, res:IResponse) => {
 //   try {
 //     const user = req.params.user; // Make sure this is what you intend.

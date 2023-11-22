@@ -1,12 +1,28 @@
-// const mysql = require("mysql");
-// const bcrypt = require("bcryptjs");
+import bcryptjs from "bcryptjs";
+import IRequest from "../interfaces/IRequest";
+import IResponse from "../interfaces/IResponse";
+import multer, { Multer } from "multer";
+import path from "path";
 
-// const conn = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "re_pro",
-// });
+// Multer
+const storage = multer.diskStorage({
+  destination: function (req: IRequest, file: any, cb: any) {
+    cb(null, "./uploads");
+  },
+  filename: function (req: IRequest, file: any, cb: any) {
+    const ext = path.extname(file.originalname);
+    const name = path.basename(file.originalname, ext);
+    // console.log(ext[ext.length-1])
+    cb(null, `${name}-${Date.now()}.${ext}`);
+  },
+});
+
+export const createDocument = async (
+  req: IRequest,
+  res: IResponse
+): Promise<IResponse> => {
+  return res.status(400).json({ message: "Testing..." });
+};
 
 // const deleteDoc = async (req, res) => {
 //   if (!user) return res.status(400).send({ message: "User not found!" });
