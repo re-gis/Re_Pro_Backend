@@ -12,7 +12,7 @@ const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const fs_1 = __importDefault(require("fs"));
 const user_routes_1 = require("./routes/user.routes");
-const postgres_1 = __importDefault(require("./config/postgres/postgres"));
+const typeorm_1 = require("typeorm");
 // const conn = mysql.createConnection({
 //   host: "localhost",
 //   user: "root",
@@ -20,7 +20,13 @@ const postgres_1 = __importDefault(require("./config/postgres/postgres"));
 //   database: "re_pro",
 // });
 // Postgres
-(0, postgres_1.default)();
+(0, typeorm_1.createConnection)()
+    .then((conn) => {
+    console.log("Connected successfully to postgres...");
+})
+    .catch((e) => {
+    console.log(e);
+});
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 // static files

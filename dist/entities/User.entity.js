@@ -9,9 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv").config();
 const typeorm_1 = require("typeorm");
 const Enums_1 = require("../enums/Enums");
-require("dotenv").config();
 let User = class User {
     constructor(email, password, number, name, profilePic, cloudId, church, language, verified, position, idNumber) {
         this.email = email;
@@ -48,19 +48,19 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar" }),
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "profilePic", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar" }),
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "cloudinaryId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar" }),
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "church", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar" }),
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "language", void 0);
 __decorate([
@@ -68,11 +68,11 @@ __decorate([
     __metadata("design:type", Boolean)
 ], User.prototype, "verified", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar" }),
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
     __metadata("design:type", Number)
 ], User.prototype, "position", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar" }),
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "idNumber", void 0);
 User = __decorate([

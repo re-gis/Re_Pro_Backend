@@ -2,7 +2,20 @@ import express from "express";
 export const userRouter = express.Router();
 import passport from "passport";
 import { protect } from "../middlewares/userAuth";
-import { userRegister, verifyOtp } from "../controllers/user.Controllers";
+import {
+  deleteMyAccount,
+  forgotPassword,
+  getAnyUserProfile,
+  getUserProfile,
+  loginUser,
+  profilePicRemove,
+  resetPassword,
+  updateProfile,
+  updateUserStats,
+  uploadPicture,
+  userRegister,
+  verifyOtp,
+} from "../controllers/user.Controllers";
 
 userRouter.use(passport.initialize());
 
@@ -31,34 +44,34 @@ userRouter.get(
 );
 
 // Update user stats
-// userRouter.put("/register/update", protect, updateUserStats);
+userRouter.put("/register/update", protect, updateUserStats);
 
 // Login user
-// userRouter.post("/login", loginUser);
+userRouter.post("/login", loginUser);
 
 // Forgot password
-// userRouter.post("/password/forgot", protect, forgotPassword);
+userRouter.post("/password/forgot", protect, forgotPassword);
 
 // Reset password
-// userRouter.post("/password/reset", protect, resetPassword);
+userRouter.post("/password/reset", protect, resetPassword);
 
 // Upload profile picture
-// userRouter.post("/profile/photo/upload", protect, uploadPicture);
+userRouter.post("/profile/photo/upload", protect, uploadPicture);
 
 // Remove profile pic
-// userRouter.put("/:user/profile/photo/remove", protect, profilePicRemove);
+userRouter.put("/:user/profile/photo/remove", protect, profilePicRemove);
 
-// get my profile
-// userRouter.get("/:user/my/profile", protect, getUserProfile);
+// get any user profile
+userRouter.get("/:user/my/profile", protect, getAnyUserProfile);
 
-// Get any user profile
-// userRouter.get("/:user/profile", protect, getAnyUserProfile);
+// Get my profile
+userRouter.get("/my/profile", protect, getUserProfile);
 
 // Update user profile
-// userRouter.put("/:user/profile/update", protect, updateProfile);
+userRouter.put("/profile/update", protect, updateProfile);
 
 // Delete account
-// userRouter.delete("/:user/profile/delete", protect, deleteMyAccount);
+userRouter.delete("/profile/delete", protect, deleteMyAccount);
 
 // Get total workers
 // userRouter.get("/workers", getTotalWorkers);

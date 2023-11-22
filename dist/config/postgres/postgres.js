@@ -9,7 +9,7 @@ function connectToDatabase() {
         username: "postgres",
         password: "Password@2001",
         database: "re_pro",
-        entities: [__dirname + "/entities/*.ts"],
+        entities: [__dirname + "../entities/*.ts"],
         synchronize: true,
         logging: true,
     })

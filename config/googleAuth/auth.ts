@@ -1,5 +1,5 @@
-const passport = require('passport')
-
+import passport, { Profile } from "passport";
+import IRequest from "../../interfaces/IRequest";
 
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const GOOGLE_CLIENT_ID =
@@ -14,17 +14,23 @@ passport.use(
       callbackURL: "http://localhost:5001/google/callback",
       passReqToCallback: true,
     },
-    function (request, accessToken, refreshToken, profile, done) {
+    function (
+      request: IRequest,
+      accessToken: string,
+      refreshToken: string,
+      profile: Profile,
+      done: any
+    ) {
       //   User.findOrCreate({ googleId: profile.id }, function (err, user) {
       return done(null, profile);
     }
   )
 );
 
-passport.serializeUser((user, done) => {
+passport.serializeUser((user: any, done) => {
   done(null, user);
 });
 
-passport.deserializeUser((user, done) => {
+passport.deserializeUser((user: any, done) => {
   done(null, user);
 });

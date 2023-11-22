@@ -13,7 +13,7 @@ import IRequest from "./interfaces/IRequest";
 import IResponse from "./interfaces/IResponse";
 import { Socket } from "socket.io";
 import { userRouter } from "./routes/user.routes";
-import connectToDatabase from "./config/postgres/postgres";
+import { createConnection } from "typeorm";
 
 // const conn = mysql.createConnection({
 //   host: "localhost",
@@ -23,8 +23,13 @@ import connectToDatabase from "./config/postgres/postgres";
 // });
 
 // Postgres
-connectToDatabase()
-
+createConnection()
+  .then((conn) => {
+    console.log("Connected successfully to postgres...");
+  })
+  .catch((e) => {
+    console.log(e);
+  });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

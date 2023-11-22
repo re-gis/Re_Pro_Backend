@@ -7,6 +7,7 @@ exports.userRouter = void 0;
 const express_1 = __importDefault(require("express"));
 exports.userRouter = express_1.default.Router();
 const passport_1 = __importDefault(require("passport"));
+const userAuth_1 = require("../middlewares/userAuth");
 const user_Controllers_1 = require("../controllers/user.Controllers");
 exports.userRouter.use(passport_1.default.initialize());
 require("../config/googleAuth/auth");
@@ -25,25 +26,25 @@ exports.userRouter.get("/google/callback", passport_1.default.authenticate("goog
     }
 }));
 // Update user stats
-// userRouter.put("/register/update", protect, updateUserStats);
+exports.userRouter.put("/register/update", userAuth_1.protect, user_Controllers_1.updateUserStats);
 // Login user
-// userRouter.post("/login", loginUser);
+exports.userRouter.post("/login", user_Controllers_1.loginUser);
 // Forgot password
-// userRouter.post("/password/forgot", protect, forgotPassword);
+exports.userRouter.post("/password/forgot", userAuth_1.protect, user_Controllers_1.forgotPassword);
 // Reset password
-// userRouter.post("/password/reset", protect, resetPassword);
+exports.userRouter.post("/password/reset", userAuth_1.protect, user_Controllers_1.resetPassword);
 // Upload profile picture
-// userRouter.post("/profile/photo/upload", protect, uploadPicture);
+exports.userRouter.post("/profile/photo/upload", userAuth_1.protect, user_Controllers_1.uploadPicture);
 // Remove profile pic
-// userRouter.put("/:user/profile/photo/remove", protect, profilePicRemove);
-// get my profile
-// userRouter.get("/:user/my/profile", protect, getUserProfile);
-// Get any user profile
-// userRouter.get("/:user/profile", protect, getAnyUserProfile);
+exports.userRouter.put("/:user/profile/photo/remove", userAuth_1.protect, user_Controllers_1.profilePicRemove);
+// get any user profile
+exports.userRouter.get("/:user/my/profile", userAuth_1.protect, user_Controllers_1.getAnyUserProfile);
+// Get my profile
+exports.userRouter.get("/my/profile", userAuth_1.protect, user_Controllers_1.getUserProfile);
 // Update user profile
-// userRouter.put("/:user/profile/update", protect, updateProfile);
+exports.userRouter.put("/:user_number/profile/update", userAuth_1.protect, user_Controllers_1.updateProfile);
 // Delete account
-// userRouter.delete("/:user/profile/delete", protect, deleteMyAccount);
+exports.userRouter.delete("/:user/profile/delete", userAuth_1.protect, user_Controllers_1.deleteMyAccount);
 // Get total workers
 // userRouter.get("/workers", getTotalWorkers);
 // Get pastors
