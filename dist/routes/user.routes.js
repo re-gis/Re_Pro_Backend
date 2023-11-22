@@ -42,9 +42,9 @@ exports.userRouter.get("/:user/my/profile", userAuth_1.protect, user_Controllers
 // Get my profile
 exports.userRouter.get("/my/profile", userAuth_1.protect, user_Controllers_1.getUserProfile);
 // Update user profile
-exports.userRouter.put("/:user_number/profile/update", userAuth_1.protect, user_Controllers_1.updateProfile);
+exports.userRouter.put("/profile/update", userAuth_1.protect, user_Controllers_1.updateProfile);
 // Delete account
-exports.userRouter.delete("/:user/profile/delete", userAuth_1.protect, user_Controllers_1.deleteMyAccount);
+exports.userRouter.delete("/profile/delete", userAuth_1.protect, user_Controllers_1.deleteMyAccount);
 // Get total workers
 // userRouter.get("/workers", getTotalWorkers);
 // Get pastors

@@ -355,7 +355,7 @@ const uploadPicture = async (req, res) => {
         if (!photo.mimetype.startsWith("image")) {
             return res.status(400).json({ message: "Upload a photo please!" });
         }
-        const ext = photo.name.split(".")[photo.name.length - 1];
+        const ext = photo.name.split(".")[1];
         photo.name = `${user.name}${Date.now()}.${ext}`;
         console.log(photo);
         try {

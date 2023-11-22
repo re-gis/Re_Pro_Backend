@@ -1,9 +1,9 @@
 {
   "type": "postgres",
-  "host": "localhost",
+  "host": "dpg-cleteurl00ks739tmgd0-a",
   "port": 5432,
-  "username": "postgres",
-  "password": "Password@2001",
+  "username": "merci",
+  "password": "6OLP6t3tLKfsY5pAcbi1b4Tq9mTb7zrp",
   "database": "re_pro",
   "synchronize": true,
   "logging": true,
