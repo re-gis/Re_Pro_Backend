@@ -11,7 +11,7 @@ const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const fs_1 = __importDefault(require("fs"));
-const user_routes_1 = require("./routes/user.routes");
+const user_routes_1 = require("./modules/users/user.routes");
 const typeorm_1 = require("typeorm");
 const db_1 = require("./config/mongodb/db");
 // Postgres
@@ -49,20 +49,7 @@ app.use((0, express_fileupload_1.default)({
 // app.use("/documentation", swaggerUi.serve, swaggerUi.setup());
 /* Upload a document
    ----------------- */
-// Multer
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "./uploads");
-//   },
-//   filename: function (req, file, cb) {
-//     const ext = file.originalname.split(".");
-//     const e = ext[ext.length - 1];
-//     // console.log(ext[ext.length-1])
-//     cb(null, `${file.originalname}.${e}`);
-//   },
-// });
 // // Upload a document
-// const upload = multer({ storage: storage }).single("file");
 // app.post("/api/docs/:user/create", upload, async (req:IRequest, res:IResponse) => {
 //   try {
 //     const user = req.params.user; // Make sure this is what you intend.

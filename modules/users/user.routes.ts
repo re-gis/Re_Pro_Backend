@@ -19,7 +19,7 @@ import {
 
 userRouter.use(passport.initialize());
 
-require("../config/googleAuth/auth");
+require("../../config/googleAuth/auth");
 
 // Signup user
 userRouter.post("/register", userRegister);
