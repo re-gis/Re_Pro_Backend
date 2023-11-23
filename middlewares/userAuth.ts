@@ -4,6 +4,7 @@ import IResponse from "../interfaces/IResponse";
 import { NextFunction } from "express";
 import User from "../entities/User.entity";
 import { getRepository, Repository } from "typeorm";
+import { EPosition } from "../enums/Enums";
 const mysql = require("mysql");
 
 const conn = mysql.createConnection({
@@ -62,4 +63,16 @@ export const protect = async (
     console.log(error);
     res.status(500);
   }
+};
+
+export const role = (...roles: EPosition[]) => {
+  return (req: IRequest, res: IResponse, next: NextFunction) => {
+    if (!roles.includes(req.user.position)) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorised to perform this action..." });
+    } else {
+      next();
+    }
+  };
 };

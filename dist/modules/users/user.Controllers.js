@@ -16,12 +16,12 @@ const typeorm_1 = require("typeorm");
 const otp_entity_1 = __importDefault(require("../../entities/otp.entity"));
 const Enums_1 = require("../../enums/Enums");
 const cloudinary_1 = __importDefault(require("../../config/cloudinary"));
-// const { cloudinary } = require("../config/cloudinary/cloudinary");
 const object = joi_1.default.object({
     email: joi_1.default.string().min(3).email().max(200).required(),
     password: joi_1.default.string().min(8).max(100).required(),
     number: joi_1.default.string().required(),
     name: joi_1.default.string().required(),
+    position: joi_1.default.string().required(),
 });
 // Generate token
 const generateToken = (user) => {
@@ -77,29 +77,28 @@ const userRegister = async (req, res) => {
                         number,
                         otp: hashedOtp,
                     });
-                    const message = await tw.messages.create({
-                        from: "+12765985304",
-                        to: number,
-                        body: `Your Verification Code is ${OTP}`,
+                    // const message = await tw.messages.create({
+                    //   from: "+12765985304",
+                    //   to: number,
+                    //   body: `Your Verification Code is ${OTP}`,
+                    // });
+                    // if (!message) {
+                    //   console.log(error);
+                    //   return res
+                    //     .status(500)
+                    //     .json({ message: "Internal server error..." });
+                    // } else {
+                    const hashedPass = bcryptjs_1.default.hashSync(password, 10);
+                    // Save user
+                    const profile = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fblank-profile-pic&psig=AOvVaw1kAh7UoZf3vqRdoN82Zab4&ust=1700721974142000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCMCRs56B14IDFQAAAAAdAAAAABAE";
+                    const user = new User_entity_1.default(email, hashedPass, number, name, profile);
+                    // Save user
+                    userRepo.save(user);
+                    otpRepo.save(otp);
+                    return res.status(201).json({
+                        message: "User registered successfully, verify to continue...",
                     });
-                    if (!message) {
-                        console.log(error);
-                        return res
-                            .status(500)
-                            .json({ message: "Internal server error..." });
-                    }
-                    else {
-                        const hashedPass = bcryptjs_1.default.hashSync(password, 10);
-                        // Save user
-                        const profile = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fblank-profile-pic&psig=AOvVaw1kAh7UoZf3vqRdoN82Zab4&ust=1700721974142000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCMCRs56B14IDFQAAAAAdAAAAABAE";
-                        const user = new User_entity_1.default(email, hashedPass, number, name, profile);
-                        // Save user
-                        userRepo.save(user);
-                        otpRepo.save(otp);
-                        return res.status(201).json({
-                            message: "User registered successfully, verify to continue...",
-                        });
-                    }
+                    // }
                 }
             }
         }
@@ -169,7 +168,6 @@ const updateUserStats = async (req, res) => {
                     .json({ message: `User ${user.email} not found!` });
             }
             let ps = position.toLowerCase();
-            console.log({ ps, position });
             switch (ps) {
                 case "secretary":
                     position = Enums_1.EPosition.SECRETARY;
@@ -181,7 +179,19 @@ const updateUserStats = async (req, res) => {
                     position = Enums_1.EPosition.PASTOR;
                     break;
                 case "admin":
-                    position = Enums_1.EPosition.ADMIN;
+                    position = Enums_1.EPosition.SUPER;
+                    break;
+                case "evangelist":
+                    position = Enums_1.EPosition.EVANGELIST;
+                    break;
+                case "human resource":
+                    position = Enums_1.EPosition.HUMRE;
+                    break;
+                case "pos":
+                    position = Enums_1.EPosition.POs;
+                    break;
+                case "super":
+                    position = Enums_1.EPosition.SUPER;
                     break;
                 default:
                     return res.status(403).json({ message: "Position not allowed..." });

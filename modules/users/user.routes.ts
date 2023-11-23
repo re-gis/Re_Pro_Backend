@@ -1,7 +1,7 @@
 import express from "express";
 export const userRouter = express.Router();
 import passport from "passport";
-import { protect } from "../../middlewares/userAuth";
+import { protect, role } from "../../middlewares/userAuth";
 import {
   deleteMyAccount,
   forgotPassword,
@@ -16,13 +16,14 @@ import {
   userRegister,
   verifyOtp,
 } from "./user.Controllers";
+import { EPosition } from "../../enums/Enums";
 
 userRouter.use(passport.initialize());
 
 require("../../config/googleAuth/auth");
 
 // Signup user
-userRouter.post("/register", userRegister);
+userRouter.post("/register", protect, role(EPosition.SUPER), userRegister);
 
 // Verify number
 userRouter.post("/register/verify", verifyOtp);
