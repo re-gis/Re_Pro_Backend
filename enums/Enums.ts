@@ -1,6 +1,9 @@
 export  enum EPosition {
-    ADMIN,
+    SUPER,
     PASTOR,
     SECRETARY,
-    BISHOP
+    BISHOP,
+    EVANGELIST,
+    POs,
+    HUMRE
 }

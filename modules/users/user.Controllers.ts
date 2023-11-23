@@ -12,13 +12,13 @@ import { getRepository, Repository } from "typeorm";
 import Otp from "../../entities/otp.entity";
 import { EPosition } from "../../enums/Enums";
 import cloudinary from "../../config/cloudinary";
-// const { cloudinary } = require("../config/cloudinary/cloudinary");
 
 const object = Joi.object({
   email: Joi.string().min(3).email().max(200).required(),
   password: Joi.string().min(8).max(100).required(),
   number: Joi.string().required(),
   name: Joi.string().required(),
+  position: Joi.string().required(),
 });
 
 // Generate token
@@ -83,18 +83,18 @@ export const userRegister = async (
             otp: hashedOtp,
           });
 
-          const message = await tw.messages.create({
-            from: "+12765985304",
-            to: number,
-            body: `Your Verification Code is ${OTP}`,
-          });
+          // const message = await tw.messages.create({
+          //   from: "+12765985304",
+          //   to: number,
+          //   body: `Your Verification Code is ${OTP}`,
+          // });
 
-          if (!message) {
-            console.log(error);
-            return res
-              .status(500)
-              .json({ message: "Internal server error..." });
-          } else {
+          // if (!message) {
+          //   console.log(error);
+          //   return res
+          //     .status(500)
+          //     .json({ message: "Internal server error..." });
+          // } else {
             const hashedPass = bcryptjs.hashSync(password, 10);
             // Save user
             const profile: string =
@@ -108,7 +108,7 @@ export const userRegister = async (
             return res.status(201).json({
               message: "User registered successfully, verify to continue...",
             });
-          }
+          // }
         }
       }
     }
@@ -186,7 +186,6 @@ export const updateUserStats = async (
           .json({ message: `User ${user.email} not found!` });
       }
       let ps: string = position.toLowerCase();
-      console.log({ ps, position });
       switch (ps) {
         case "secretary":
           position = EPosition.SECRETARY;
@@ -201,7 +200,23 @@ export const updateUserStats = async (
           break;
 
         case "admin":
-          position = EPosition.ADMIN;
+          position = EPosition.SUPER;
+          break;
+
+        case "evangelist":
+          position = EPosition.EVANGELIST;
+          break;
+
+        case "human resource":
+          position = EPosition.HUMRE;
+          break;
+
+        case "pos":
+          position = EPosition.POs;
+          break;
+
+        case "super":
+          position = EPosition.SUPER;
           break;
 
         default:

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.protect = void 0;
+exports.role = exports.protect = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const User_entity_1 = __importDefault(require("../entities/User.entity"));
 const typeorm_1 = require("typeorm");
@@ -58,3 +58,16 @@ const protect = async (req, res, next) => {
     }
 };
 exports.protect = protect;
+const role = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.position)) {
+            return res
+                .status(403)
+                .json({ message: "You are not authorised to perform this action..." });
+        }
+        else {
+            next();
+        }
+    };
+};
+exports.role = role;
