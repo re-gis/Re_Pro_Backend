@@ -5,13 +5,13 @@ require("dotenv").config();
 import twilio from "twilio";
 const tw = twilio(process.env.SID, process.env.AUTH_TOKEN);
 import jwt from "jsonwebtoken";
-import User from "../entities/User.entity";
-import IRequest from "../interfaces/IRequest";
-import IResponse from "../interfaces/IResponse";
+import User from "../../entities/User.entity";
+import IRequest from "../../interfaces/IRequest";
+import IResponse from "../../interfaces/IResponse";
 import { getRepository, Repository } from "typeorm";
-import Otp from "../entities/otp.entity";
-import { EPosition } from "../enums/Enums";
-import cloudinary from "../config/cloudinary";
+import Otp from "../../entities/otp.entity";
+import { EPosition } from "../../enums/Enums";
+import cloudinary from "../../config/cloudinary";
 // const { cloudinary } = require("../config/cloudinary/cloudinary");
 
 const object = Joi.object({

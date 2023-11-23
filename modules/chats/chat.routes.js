@@ -1,5 +1,5 @@
 const express = require("express");
-const protect = require("../middlewares/userAuth");
+const protect = require("../../middlewares/userAuth");
 const {
   accessChat,
   fetchChats,

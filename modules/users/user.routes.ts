@@ -1,7 +1,7 @@
 import express from "express";
 export const userRouter = express.Router();
 import passport from "passport";
-import { protect } from "../middlewares/userAuth";
+import { protect } from "../../middlewares/userAuth";
 import {
   deleteMyAccount,
   forgotPassword,
@@ -15,7 +15,7 @@ import {
   uploadPicture,
   userRegister,
   verifyOtp,
-} from "../controllers/user.Controllers";
+} from "./user.Controllers";
 
 userRouter.use(passport.initialize());
 

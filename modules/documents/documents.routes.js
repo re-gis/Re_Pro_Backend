@@ -1,7 +1,7 @@
 import express from "express";
 export const documentRouter = express.Router();
-import { protect } from "../middlewares/userAuth";
-import { createDocument } from "../controllers/documents.controller";
+import { protect } from "../../middlewares/userAuth";
+import { createDocument } from "./documents.controller";
 
 const upload = multer({ storage: storage }).single("file");
 

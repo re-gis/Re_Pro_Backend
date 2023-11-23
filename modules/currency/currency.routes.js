@@ -1,6 +1,6 @@
 const express = require('express')
 const { createFund, getFunds, updateFund } = require('../controllers/currency.controllers')
-const protect = require('../middlewares/userAuth')
+const protect = require('../../middlewares/userAuth')
 const currencyRouter = express.Router()
 
 

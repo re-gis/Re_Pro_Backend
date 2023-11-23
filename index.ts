@@ -8,7 +8,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import fs from "fs";
 import { Socket } from "socket.io";
-import { userRouter } from "./routes/user.routes";
+import { userRouter } from "./modules/users/user.routes";
 import { createConnection } from "typeorm";
 import { connectDatabase } from "./config/mongodb/db";
 // Postgres

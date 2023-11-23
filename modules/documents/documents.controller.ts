@@ -1,6 +1,6 @@
 import bcryptjs from "bcryptjs";
-import IRequest from "../interfaces/IRequest";
-import IResponse from "../interfaces/IResponse";
+import IRequest from "../../interfaces/IRequest";
+import IResponse from "../../interfaces/IResponse";
 import multer, { Multer } from "multer";
 import path from "path";
 
