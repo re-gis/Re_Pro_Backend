@@ -8,10 +8,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv").config();
 const typeorm_1 = require("typeorm");
 const Enums_1 = require("../enums/Enums");
+const document_entity_1 = __importDefault(require("./document.entity"));
 let User = class User {
     constructor(email, password, number, name, profilePic, cloudId, church, language, verified, position, idNumber) {
         this.email = email;
@@ -75,6 +79,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "idNumber", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => document_entity_1.default, (doc) => doc.user),
+    __metadata("design:type", Array)
+], User.prototype, "documents", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)("users"),
     __metadata("design:paramtypes", [String, String, String, String, String, String, String, String, Boolean, Number, String])

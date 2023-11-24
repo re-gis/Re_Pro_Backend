@@ -4,22 +4,57 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDocument = void 0;
-const multer_1 = __importDefault(require("multer"));
-const path_1 = __importDefault(require("path"));
-// Multer
-const storage = multer_1.default.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "./uploads");
-    },
-    filename: function (req, file, cb) {
-        const ext = path_1.default.extname(file.originalname);
-        const name = path_1.default.basename(file.originalname, ext);
-        // console.log(ext[ext.length-1])
-        cb(null, `${name}-${Date.now()}.${ext}`);
-    },
-});
+const User_entity_1 = __importDefault(require("../../entities/User.entity"));
+const typeorm_1 = require("typeorm");
+const document_entity_1 = __importDefault(require("../../entities/document.entity"));
 const createDocument = async (req, res) => {
-    return res.status(400).json({ message: "Testing..." });
+    try {
+        const userRepo = (0, typeorm_1.getRepository)(User_entity_1.default);
+        const docRepo = (0, typeorm_1.getRepository)(document_entity_1.default);
+        const user = req.user;
+        if (!user)
+            return res.status(401).json({ message: "please login to continue..." });
+        const u = await userRepo.findOne({
+            where: { number: user.number, email: user.email },
+        });
+        if (!u)
+            return res.status(404).json({ message: "User not found!" });
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ message: "No files were uploaded." });
+        }
+        const { description } = req.body;
+        if (!description)
+            return res
+                .status(401)
+                .json({ message: "Document description is required!" });
+        const uploadedDoc = req.files.document;
+        if (uploadedDoc.name.split(".")[1] == "ocx") {
+            uploadedDoc.name = uploadedDoc.name + ".docx";
+        }
+        const path = "E:\\Workspace\\Re_Pro\\backend\\uploads\\" + uploadedDoc.name;
+        uploadedDoc.mv(path, (err) => {
+            if (err) {
+                return res
+                    .status(500)
+                    .json({ message: "Error while uploading the document..." });
+            }
+        });
+        const doc = new document_entity_1.default(uploadedDoc.name + u.number, description, path, u);
+        if (!u.documents) {
+            u.documents = [];
+        }
+        u.documents.push(doc);
+        await userRepo.save(u);
+        await docRepo.save(doc);
+        return res
+            .status(201)
+            .json({ message: "Document uploaded successfully..." });
+        // save the doc
+    }
+    catch (e) {
+        console.log(e);
+        return res.status(500).json({ message: "Internal server error..." });
+    }
 };
 exports.createDocument = createDocument;
 // const deleteDoc = async (req, res) => {

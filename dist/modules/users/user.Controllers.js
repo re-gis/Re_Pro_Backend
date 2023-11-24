@@ -39,9 +39,16 @@ const generateToken = (user) => {
 const userRegister = async (req, res) => {
     const otpRepo = (0, typeorm_1.getRepository)(otp_entity_1.default, "default");
     const userRepo = (0, typeorm_1.getRepository)(User_entity_1.default, "default");
+    const findByEmailOrNumber = async (email, number) => {
+        const user = await userRepo.findOne({
+            where: [{ email }, { number }],
+        });
+        return user;
+    };
     try {
         const { email, number, password, name } = req.body;
-        if (!email || !password || !number || !name) {
+        let position = req.body.position;
+        if (!email || !password || !number || !name || !position) {
             return res.status(400).json({ message: "All credentials are required!" });
         }
         else {
@@ -50,7 +57,7 @@ const userRegister = async (req, res) => {
                 return res.status(400).json({ message: error.details[0].message });
             }
             else {
-                const euser = await userRepo.findOne({ where: { email } });
+                const euser = await findByEmailOrNumber(email, number);
                 if (euser) {
                     return res.status(400).json({ message: "User already exists!" });
                 }
@@ -91,10 +98,42 @@ const userRegister = async (req, res) => {
                     const hashedPass = bcryptjs_1.default.hashSync(password, 10);
                     // Save user
                     const profile = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fblank-profile-pic&psig=AOvVaw1kAh7UoZf3vqRdoN82Zab4&ust=1700721974142000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCMCRs56B14IDFQAAAAAdAAAAABAE";
+                    let ps = position.toLowerCase();
+                    switch (ps) {
+                        case "secretary":
+                            position = Enums_1.EPosition.SECRETARY;
+                            break;
+                        case "bishop":
+                            position = Enums_1.EPosition.BISHOP;
+                            break;
+                        case "pastor":
+                            position = Enums_1.EPosition.PASTOR;
+                            break;
+                        case "admin":
+                            position = Enums_1.EPosition.SUPER;
+                            break;
+                        case "evangelist":
+                            position = Enums_1.EPosition.EVANGELIST;
+                            break;
+                        case "human resource":
+                            position = Enums_1.EPosition.HUMRE;
+                            break;
+                        case "pos":
+                            position = Enums_1.EPosition.POs;
+                            break;
+                        case "super":
+                            position = Enums_1.EPosition.SUPER;
+                            break;
+                        default:
+                            return res
+                                .status(403)
+                                .json({ message: "Position not allowed..." });
+                    }
                     const user = new User_entity_1.default(email, hashedPass, number, name, profile);
+                    user.position = position;
                     // Save user
-                    userRepo.save(user);
-                    otpRepo.save(otp);
+                    await userRepo.save(user);
+                    await otpRepo.save(otp);
                     return res.status(201).json({
                         message: "User registered successfully, verify to continue...",
                     });
@@ -133,7 +172,7 @@ const verifyOtp = async (req, res) => {
         user.verified = true;
         // delete the opt
         await otpRepo.remove(eotp);
-        userRepo.save(user);
+        await userRepo.save(user);
         return res.status(200).json({
             message: "Account verified successfully...",
             token: generateToken(user),

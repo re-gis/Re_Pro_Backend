@@ -14,6 +14,7 @@ exports.userRouter.use(passport_1.default.initialize());
 require("../../config/googleAuth/auth");
 // Signup user
 exports.userRouter.post("/register", userAuth_1.protect, (0, userAuth_1.role)(Enums_1.EPosition.SUPER), user_Controllers_1.userRegister);
+// userRouter.post("/register", userRegister);
 // Verify number
 exports.userRouter.post("/register/verify", user_Controllers_1.verifyOtp);
 // Google signup
