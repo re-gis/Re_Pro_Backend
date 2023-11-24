@@ -26,7 +26,9 @@ export default class Document {
   @Column({ type: "timestamp" })
   uploadDate: Date;
 
-  @ManyToOne(() => User, (user) => user.documents)
+  @ManyToOne(() => User, (user) => user.documents,{
+    onDelete:"CASCADE"
+  })
   @JoinColumn({ name: "userId" })
   user: User;
 

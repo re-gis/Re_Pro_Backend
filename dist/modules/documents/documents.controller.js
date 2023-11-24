@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createDocument = void 0;
+exports.getMyDocs = exports.createDocument = void 0;
+const path_1 = __importDefault(require("path"));
 const User_entity_1 = __importDefault(require("../../entities/User.entity"));
 const typeorm_1 = require("typeorm");
 const document_entity_1 = __importDefault(require("../../entities/document.entity"));
@@ -31,15 +32,16 @@ const createDocument = async (req, res) => {
         if (uploadedDoc.name.split(".")[1] == "ocx") {
             uploadedDoc.name = uploadedDoc.name + ".docx";
         }
-        const path = "E:\\Workspace\\Re_Pro\\backend\\uploads\\" + uploadedDoc.name;
-        uploadedDoc.mv(path, (err) => {
+        const pathToUploads = path_1.default.join(__dirname, 'uploads');
+        const filePath = path_1.default.join(pathToUploads, uploadedDoc.name);
+        uploadedDoc.mv(filePath, (err) => {
             if (err) {
                 return res
                     .status(500)
                     .json({ message: "Error while uploading the document..." });
             }
         });
-        const doc = new document_entity_1.default(uploadedDoc.name + u.number, description, path, u);
+        const doc = new document_entity_1.default(uploadedDoc.name + u.number, description, filePath, u);
         if (!u.documents) {
             u.documents = [];
         }
@@ -97,25 +99,39 @@ exports.createDocument = createDocument;
 //   });
 // };
 // // Get my sent docs
-// const getMyDocs = async (req, res) => {
-//   if (!user) return res.status(400).send({ message: "User not found!" });
-//   if (user.name !== req.params.me)
-//     return res
-//       .status(400)
-//       .send({ message: "Not authorised to perform this action!" });
-//   // Get the user docs
-//   const sql = `SELECT * FROM documents WHERE reporter='${user.name}'`;
-//   conn.query(sql, async (err, data) => {
-//     if (err)
-//       return res.status(500).send({ message: "Internal server error..." });
-//     if (data.length === 0)
-//       return res.status(400).send({ message: "No sent documents found!" });
-//     return res.status(200).send({
-//       userDoc: data,
-//       message: "User document fetched!",
-//     });
-//   });
-// };
+const getMyDocs = async (req, res) => {
+    const docRepo = (0, typeorm_1.getRepository)(document_entity_1.default);
+    const user = req.user;
+    console.log(req.params.user);
+    if (!user)
+        return res.status(404).json({ message: "user not found" });
+    if (user.name !== req.params.user)
+        return res.status(401).json({ message: "user  not authorized" });
+    const documents = await docRepo.find({ where: {
+            user: { id: user.id }
+        } });
+    console.log(documents);
+    return res.status(200).json({ message: "successfully fetched", documents: documents });
+    // ger user 
+    // if (!user) return res.status(400).send({ message: "User not found!" });
+    // if (user.name !== req.params.me)
+    //   return res
+    //     .status(400)
+    //     .send({ message: "Not authorised to perform this action!" });
+    // // Get the user docs
+    // const sql = `SELECT * FROM documents WHERE reporter='${user.name}'`;
+    // conn.query(sql, async (err, data) => {
+    //   if (err)
+    //     return res.status(500).send({ message: "Internal server error..." });
+    //   if (data.length === 0)
+    //     return res.status(400).send({ message: "No sent documents found!" });
+    //   return res.status(200).send({
+    //     userDoc: data,
+    //     message: "User document fetched!",
+    //   });
+    // });
+};
+exports.getMyDocs = getMyDocs;
 // // Get received docs
 // const getReceivedDocs = async (req, res) => {
 //   if (!user) return res.status(400).send({ message: "User not found!" });

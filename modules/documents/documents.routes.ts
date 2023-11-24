@@ -1,6 +1,6 @@
 import express, { NextFunction } from "express";
 import { protect } from "../../middlewares/userAuth";
-import { createDocument } from "./documents.controller";
+import { createDocument, getMyDocs } from "./documents.controller";
 import { storage } from "../../config/Multer";
 import multer from "multer";
 import IRequest from "../../interfaces/IRequest";
@@ -30,6 +30,8 @@ documentRouter.post("/upload", protect, createDocument);
 // documentRouter.delete("/:user/doc/:id/delete", protect, deleteDoc);
 
 // Get my sent documents
+documentRouter.get("/docs/sent/:user?", protect,getMyDocs);
+
 // documentRouter.get("/:me/docs/sent", protect, getMyDocs);
 
 // Get received documents

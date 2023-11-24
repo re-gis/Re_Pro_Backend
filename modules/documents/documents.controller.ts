@@ -37,9 +37,10 @@ export const createDocument = async (
     if (uploadedDoc.name.split(".")[1] == "ocx") {
       uploadedDoc.name = uploadedDoc.name + ".docx";
     }
-    const path = "E:\\Workspace\\Re_Pro\\backend\\uploads\\" + uploadedDoc.name;
+    const pathToUploads = path.join(__dirname, 'uploads');
+    const filePath = path.join(pathToUploads, uploadedDoc.name);
 
-    uploadedDoc.mv(path, (err: any) => {
+    uploadedDoc.mv(filePath, (err: any) => {
       if (err) {
         return res
           .status(500)
@@ -47,7 +48,7 @@ export const createDocument = async (
       }
     });
 
-    const doc = new Document(uploadedDoc.name + u.number, description, path, u);
+    const doc = new Document(uploadedDoc.name + u.number, description, filePath, u);
     if (!u.documents) {
       u.documents = [];
     }
@@ -108,25 +109,43 @@ export const createDocument = async (
 // };
 
 // // Get my sent docs
-// const getMyDocs = async (req, res) => {
-//   if (!user) return res.status(400).send({ message: "User not found!" });
-//   if (user.name !== req.params.me)
-//     return res
-//       .status(400)
-//       .send({ message: "Not authorised to perform this action!" });
-//   // Get the user docs
-//   const sql = `SELECT * FROM documents WHERE reporter='${user.name}'`;
-//   conn.query(sql, async (err, data) => {
-//     if (err)
-//       return res.status(500).send({ message: "Internal server error..." });
-//     if (data.length === 0)
-//       return res.status(400).send({ message: "No sent documents found!" });
-//     return res.status(200).send({
-//       userDoc: data,
-//       message: "User document fetched!",
-//     });
-//   });
-// };
+export const getMyDocs = async (req:IRequest, res:IResponse) => {
+  const docRepo: Repository<Document> = getRepository(Document);
+
+  const user =req.user
+  console.log(req.params.user);
+  
+  if(!user) return res.status(404).json({message:"user not found"})
+  if(user.name !== req.params.user) return res.status(401).json({message:"user  not authorized"})
+
+  const documents =  await docRepo.find(
+    {where:{
+      user:{id :user.id}
+    }}
+  )
+  console.log(documents);
+  return res.status(200).json({message:"successfully fetched",documents:documents})
+  
+
+  // ger user 
+  // if (!user) return res.status(400).send({ message: "User not found!" });
+  // if (user.name !== req.params.me)
+  //   return res
+  //     .status(400)
+  //     .send({ message: "Not authorised to perform this action!" });
+  // // Get the user docs
+  // const sql = `SELECT * FROM documents WHERE reporter='${user.name}'`;
+  // conn.query(sql, async (err, data) => {
+  //   if (err)
+  //     return res.status(500).send({ message: "Internal server error..." });
+  //   if (data.length === 0)
+  //     return res.status(400).send({ message: "No sent documents found!" });
+  //   return res.status(200).send({
+  //     userDoc: data,
+  //     message: "User document fetched!",
+  //   });
+  // });
+};
 
 // // Get received docs
 // const getReceivedDocs = async (req, res) => {

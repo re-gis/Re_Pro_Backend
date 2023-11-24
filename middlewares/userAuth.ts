@@ -37,6 +37,8 @@ export const protect = async (
         const user_id = decoded.id;
 
         const user = await userRepo.findOne({ where: { id: user_id } });
+        console.log(user);
+
         if (!user) {
           return res.status(403).json({
             message: "Not authorised!",
@@ -50,6 +52,7 @@ export const protect = async (
           church: user.church,
           position: user.position,
           verified: user.verified,
+          documents:user.documents
         };
 
         next();

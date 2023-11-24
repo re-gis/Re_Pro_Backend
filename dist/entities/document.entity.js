@@ -48,7 +48,9 @@ __decorate([
     __metadata("design:type", Date)
 ], Document.prototype, "uploadDate", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => User_entity_1.default, (user) => user.documents),
+    (0, typeorm_1.ManyToOne)(() => User_entity_1.default, (user) => user.documents, {
+        onDelete: "CASCADE"
+    }),
     (0, typeorm_1.JoinColumn)({ name: "userId" }),
     __metadata("design:type", User_entity_1.default)
 ], Document.prototype, "user", void 0);
