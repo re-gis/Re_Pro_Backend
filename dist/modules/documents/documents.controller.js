@@ -32,8 +32,10 @@ const createDocument = async (req, res) => {
         if (uploadedDoc.name.split(".")[1] == "ocx") {
             uploadedDoc.name = uploadedDoc.name + ".docx";
         }
-        const pathToUploads = path_1.default.join(__dirname, 'uploads');
+        const pathToUploads = path_1.default.join(__dirname, "uploads");
         const filePath = path_1.default.join(pathToUploads, uploadedDoc.name);
+        console.log(filePath);
+        console.log(pathToUploads);
         uploadedDoc.mv(filePath, (err) => {
             if (err) {
                 return res
@@ -51,7 +53,6 @@ const createDocument = async (req, res) => {
         return res
             .status(201)
             .json({ message: "Document uploaded successfully..." });
-        // save the doc
     }
     catch (e) {
         console.log(e);
@@ -107,12 +108,16 @@ const getMyDocs = async (req, res) => {
         return res.status(404).json({ message: "user not found" });
     if (user.name !== req.params.user)
         return res.status(401).json({ message: "user  not authorized" });
-    const documents = await docRepo.find({ where: {
-            user: { id: user.id }
-        } });
+    const documents = await docRepo.find({
+        where: {
+            user: { id: user.id },
+        },
+    });
     console.log(documents);
-    return res.status(200).json({ message: "successfully fetched", documents: documents });
-    // ger user 
+    return res
+        .status(200)
+        .json({ message: "successfully fetched", documents: documents });
+    // ger user
     // if (!user) return res.status(400).send({ message: "User not found!" });
     // if (user.name !== req.params.me)
     //   return res

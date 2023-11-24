@@ -37,8 +37,10 @@ export const createDocument = async (
     if (uploadedDoc.name.split(".")[1] == "ocx") {
       uploadedDoc.name = uploadedDoc.name + ".docx";
     }
-    const pathToUploads = path.join(__dirname, 'uploads');
+    const pathToUploads = path.join(__dirname, "uploads");
     const filePath = path.join(pathToUploads, uploadedDoc.name);
+    console.log(filePath)
+    console.log(pathToUploads)
 
     uploadedDoc.mv(filePath, (err: any) => {
       if (err) {
@@ -48,7 +50,12 @@ export const createDocument = async (
       }
     });
 
-    const doc = new Document(uploadedDoc.name + u.number, description, filePath, u);
+    const doc = new Document(
+      uploadedDoc.name + u.number,
+      description,
+      filePath,
+      u
+    );
     if (!u.documents) {
       u.documents = [];
     }
@@ -58,8 +65,6 @@ export const createDocument = async (
     return res
       .status(201)
       .json({ message: "Document uploaded successfully..." });
-
-    // save the doc
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error..." });
@@ -109,25 +114,27 @@ export const createDocument = async (
 // };
 
 // // Get my sent docs
-export const getMyDocs = async (req:IRequest, res:IResponse) => {
+export const getMyDocs = async (req: IRequest, res: IResponse) => {
   const docRepo: Repository<Document> = getRepository(Document);
 
-  const user =req.user
+  const user = req.user;
   console.log(req.params.user);
-  
-  if(!user) return res.status(404).json({message:"user not found"})
-  if(user.name !== req.params.user) return res.status(401).json({message:"user  not authorized"})
 
-  const documents =  await docRepo.find(
-    {where:{
-      user:{id :user.id}
-    }}
-  )
+  if (!user) return res.status(404).json({ message: "user not found" });
+  if (user.name !== req.params.user)
+    return res.status(401).json({ message: "user  not authorized" });
+
+  const documents = await docRepo.find({
+    where: {
+      user: { id: user.id },
+    },
+  });
   console.log(documents);
-  return res.status(200).json({message:"successfully fetched",documents:documents})
-  
+  return res
+    .status(200)
+    .json({ message: "successfully fetched", documents: documents });
 
-  // ger user 
+  // ger user
   // if (!user) return res.status(400).send({ message: "User not found!" });
   // if (user.name !== req.params.me)
   //   return res
