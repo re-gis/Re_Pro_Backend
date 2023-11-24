@@ -60,7 +60,9 @@ const protect = async (req, res, next) => {
 exports.protect = protect;
 const role = (...roles) => {
     return (req, res, next) => {
-        if (!roles.includes(req.user.position)) {
+        console.log(roles);
+        console.log(req.user.position);
+        if (roles[0] != req.user.position) {
             return res
                 .status(403)
                 .json({ message: "You are not authorised to perform this action..." });

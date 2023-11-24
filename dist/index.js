@@ -14,22 +14,16 @@ const fs_1 = __importDefault(require("fs"));
 const user_routes_1 = require("./modules/users/user.routes");
 const typeorm_1 = require("typeorm");
 const db_1 = require("./config/mongodb/db");
-// Postgres
-// const connectionUrl =
-//   "postgres://merci:6OLP6t3tLKfsY5pAcbi1b4Tq9mTb7zrp@dpg-cleteurl00ks739tmgd0-a.oregon-postgres.render.com/re_pro";
-// createConnection({
-//   type: "postgres",
-//   url: connectionUrl,
-//   synchronize: true,
-//   logging: true,
-//   entities: ["dist/entities/*.js"],
-// })
-//   .then((conn) => {
-//     console.log("Connected successfully to PostgreSQL...");
-//   })
-//   .catch((error) => {
-//     console.error("Error connecting to PostgreSQL:", error);
-//   });
+const admin_routes_1 = require("./modules/admin/admin.routes");
+const documents_routes_1 = require("./modules/documents/documents.routes");
+// Fileuploader
+app.use((0, express_fileupload_1.default)({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+    limits: { fileSize: 1024 * 1024 * 1024 },
+    safeFileNames: true,
+    preserveExtension: true,
+}));
 (0, typeorm_1.createConnection)()
     .then((con) => console.log("Postgres connected successfully!"))
     .catch((e) => console.log(e));
@@ -37,93 +31,17 @@ app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 // static files
 app.use("/uploads", express_1.default.static("uploads"));
-// Fileuploader
-app.use((0, express_fileupload_1.default)({
-    useTempFiles: true,
-    tempFileDir: "/tmp/",
-}));
 // Connect database
 (0, db_1.connectDatabase)(); // MongoDB
-// connectDB(); // MySQL
 // Swagger documentation
 // app.use("/documentation", swaggerUi.serve, swaggerUi.setup());
-/* Upload a document
-   ----------------- */
-// // Upload a document
-// app.post("/api/docs/:user/create", upload, async (req:IRequest, res:IResponse) => {
-//   try {
-//     const user = req.params.user; // Make sure this is what you intend.
-//     if (!user) {
-//       return res.status(400).json({ message: "User not found!" });
-//     }
-//     if (user !== req.params.user) {
-//       return res.status(404).json({ message: "Cannot perform this action!" });
-//     }
-//     if (!req.file) {
-//       return res.status(403).json({
-//         message: "Please select a document to upload",
-//       });
-//     }
-//     // Save the link to database
-//     const docPath = path.join(__dirname, "uploads", req.file.filename);
-//     const { receiver, details, subject, church } = req.body;
-//     const sql = `INSERT INTO documents (
-//       receiver,
-//       reporter,
-//       details,
-//       subject,
-//       path,
-//       doc_name,
-//       church
-//     ) VALUES (
-//       '${receiver}',
-//       '${user}',
-//       '${details}',
-//       '${subject}',
-//       '${docPath}',
-//       '${req.file.filename}',
-//       '${church}'
-//     )`;
-//     conn.query(sql, (err, result) => {
-//       if (err) {
-//         console.log(err);
-//         return res.status(400).json({ message: "Error saving to database" });
-//       }
-//       const query = `SELECT * FROM documents WHERE reporter='${user}'`;
-//       conn.query(query, (err, data) => {
-//         if (err)
-//           return res.status(500).json({ message: "Internal server error..." });
-//         if (data.length === 0)
-//           return res.status(400).json({ message: "Document not found!" });
-//         res.json({ doc: data, message: "File uploaded successfully" });
-//       });
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     return res.status(500).json({ message: "Internal server error..." });
-//   }
-// });
-/* ----------------------------------------------------------- */
-// /* Download the document */
-// app.get("/api/docs/:user/doc/:id/download", protect, (req, res) => {
-//   const sql = `SELECT * FROM documents WHERE id='${req.params.id}'`;
-//   conn.query(sql, (err, result) => {
-//     if (err) {
-//       console.log(err);
-//       return res.status(400).json({ message: "Error downloading file" });
-//     }
-//     if (result.length === 0)
-//       return res.status(400).json({ message: "Document not found!" });
-//     const path = result[0].path;
-//     return res.status(200).download(path);
-//   });
-// });
-/* ---------------------------------------------------------------- */
-// app.use("/api/docs", documentRouter);
+app.use("/api/documents", documents_routes_1.documentRouter);
 // Use cors
 app.use((0, cors_1.default)());
 // user apis
 app.use("/api/users", user_routes_1.userRouter);
+// admin apis
+app.use("/api/admin", admin_routes_1.adminRouter);
 // Currency apis
 // app.use("/api/currency", currencyRouter);
 // Room chat apis

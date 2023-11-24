@@ -1,7 +1,13 @@
 require("dotenv").config();
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
 import { EPosition } from "../enums/Enums";
-
+import Document from "./document.entity";
 
 @Entity("users")
 export default class User {
@@ -20,26 +26,29 @@ export default class User {
   @Column({ type: "varchar", nullable: false })
   name: string;
 
-  @Column({ type: "varchar", nullable:true })
+  @Column({ type: "varchar", nullable: true })
   profilePic?: string;
 
-  @Column({ type: "varchar", nullable:true })
+  @Column({ type: "varchar", nullable: true })
   cloudinaryId?: string;
 
-  @Column({ type: "varchar", nullable:true })
+  @Column({ type: "varchar", nullable: true })
   church?: string;
 
-  @Column({ type: "varchar", nullable:true })
+  @Column({ type: "varchar", nullable: true })
   language?: string;
 
   @Column({ type: "boolean", default: false })
   verified?: boolean;
 
-  @Column({ type: "varchar", nullable:true })
+  @Column({ type: "varchar", nullable: true })
   position?: EPosition;
 
-  @Column({ type: "varchar", nullable:true })
+  @Column({ type: "varchar", nullable: true })
   idNumber?: string;
+
+  @OneToMany(() => Document, (doc) => doc.user)
+  documents!: Document[];
 
   constructor(
     email: string,

@@ -11,23 +11,18 @@ import { Socket } from "socket.io";
 import { userRouter } from "./modules/users/user.routes";
 import { createConnection } from "typeorm";
 import { connectDatabase } from "./config/mongodb/db";
-// Postgres
-// const connectionUrl =
-//   "postgres://merci:6OLP6t3tLKfsY5pAcbi1b4Tq9mTb7zrp@dpg-cleteurl00ks739tmgd0-a.oregon-postgres.render.com/re_pro";
-
-// createConnection({
-//   type: "postgres",
-//   url: connectionUrl,
-//   synchronize: true,
-//   logging: true,
-//   entities: ["dist/entities/*.js"],
-// })
-//   .then((conn) => {
-//     console.log("Connected successfully to PostgreSQL...");
-//   })
-//   .catch((error) => {
-//     console.error("Error connecting to PostgreSQL:", error);
-//   });
+import { adminRouter } from "./modules/admin/admin.routes";
+import { documentRouter } from "./modules/documents/documents.routes";
+// Fileuploader
+app.use(
+  fileUploader({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+    limits: { fileSize: 1024 * 1024 * 1024 },
+    safeFileNames: true,
+    preserveExtension: true,
+  })
+);
 
 createConnection()
   .then((con) => console.log("Postgres connected successfully!"))
@@ -38,115 +33,24 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // static files
 app.use("/uploads", express.static("uploads"));
 
-// Fileuploader
-app.use(
-  fileUploader({
-    useTempFiles: true,
-    tempFileDir: "/tmp/",
-  })
-);
-
 // Connect database
 
-connectDatabase()// MongoDB
-// connectDB(); // MySQL
+connectDatabase(); // MongoDB
 
 // Swagger documentation
 
 // app.use("/documentation", swaggerUi.serve, swaggerUi.setup());
 
-/* Upload a document
-   ----------------- */
-
-
-
-// // Upload a document
-// app.post("/api/docs/:user/create", upload, async (req:IRequest, res:IResponse) => {
-//   try {
-//     const user = req.params.user; // Make sure this is what you intend.
-
-//     if (!user) {
-//       return res.status(400).json({ message: "User not found!" });
-//     }
-
-//     if (user !== req.params.user) {
-//       return res.status(404).json({ message: "Cannot perform this action!" });
-//     }
-
-//     if (!req.file) {
-//       return res.status(403).json({
-//         message: "Please select a document to upload",
-//       });
-//     }
-
-//     // Save the link to database
-//     const docPath = path.join(__dirname, "uploads", req.file.filename);
-//     const { receiver, details, subject, church } = req.body;
-
-//     const sql = `INSERT INTO documents (
-//       receiver,
-//       reporter,
-//       details,
-//       subject,
-//       path,
-//       doc_name,
-//       church
-//     ) VALUES (
-//       '${receiver}',
-//       '${user}',
-//       '${details}',
-//       '${subject}',
-//       '${docPath}',
-//       '${req.file.filename}',
-//       '${church}'
-//     )`;
-
-//     conn.query(sql, (err, result) => {
-//       if (err) {
-//         console.log(err);
-//         return res.status(400).json({ message: "Error saving to database" });
-//       }
-//       const query = `SELECT * FROM documents WHERE reporter='${user}'`;
-//       conn.query(query, (err, data) => {
-//         if (err)
-//           return res.status(500).json({ message: "Internal server error..." });
-//         if (data.length === 0)
-//           return res.status(400).json({ message: "Document not found!" });
-//         res.json({ doc: data, message: "File uploaded successfully" });
-//       });
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     return res.status(500).json({ message: "Internal server error..." });
-//   }
-// });
-
-/* ----------------------------------------------------------- */
-
-// /* Download the document */
-// app.get("/api/docs/:user/doc/:id/download", protect, (req, res) => {
-//   const sql = `SELECT * FROM documents WHERE id='${req.params.id}'`;
-//   conn.query(sql, (err, result) => {
-//     if (err) {
-//       console.log(err);
-//       return res.status(400).json({ message: "Error downloading file" });
-//     }
-//     if (result.length === 0)
-//       return res.status(400).json({ message: "Document not found!" });
-//     const path = result[0].path;
-//     return res.status(200).download(path);
-//   });
-// });
-
-/* ---------------------------------------------------------------- */
-
-// app.use("/api/docs", documentRouter);
+app.use("/api/documents", documentRouter);
 
 // Use cors
 app.use(cors());
 
 // user apis
 app.use("/api/users", userRouter);
+
+// admin apis
+app.use("/api/admin", adminRouter);
 
 // Currency apis
 // app.use("/api/currency", currencyRouter);

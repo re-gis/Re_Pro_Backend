@@ -3,25 +3,66 @@ import IRequest from "../../interfaces/IRequest";
 import IResponse from "../../interfaces/IResponse";
 import multer, { Multer } from "multer";
 import path from "path";
-
-// Multer
-const storage = multer.diskStorage({
-  destination: function (req: IRequest, file: any, cb: any) {
-    cb(null, "./uploads");
-  },
-  filename: function (req: IRequest, file: any, cb: any) {
-    const ext = path.extname(file.originalname);
-    const name = path.basename(file.originalname, ext);
-    // console.log(ext[ext.length-1])
-    cb(null, `${name}-${Date.now()}.${ext}`);
-  },
-});
+import User from "../../entities/User.entity";
+import { Repository, getRepository } from "typeorm";
+import Document from "../../entities/document.entity";
 
 export const createDocument = async (
   req: IRequest,
   res: IResponse
 ): Promise<IResponse> => {
-  return res.status(400).json({ message: "Testing..." });
+  try {
+    const userRepo: Repository<User> = getRepository(User);
+    const docRepo: Repository<Document> = getRepository(Document);
+    const user: User = req.user;
+    if (!user)
+      return res.status(401).json({ message: "please login to continue..." });
+
+    const u = await userRepo.findOne({
+      where: { number: user.number, email: user.email },
+    });
+    if (!u) return res.status(404).json({ message: "User not found!" });
+
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).json({ message: "No files were uploaded." });
+    }
+
+    const { description } = req.body;
+    if (!description)
+      return res
+        .status(401)
+        .json({ message: "Document description is required!" });
+
+    const uploadedDoc = req.files.document;
+    if (uploadedDoc.name.split(".")[1] == "ocx") {
+      uploadedDoc.name = uploadedDoc.name + ".docx";
+    }
+    const path = "E:\\Workspace\\Re_Pro\\backend\\uploads\\" + uploadedDoc.name;
+
+    uploadedDoc.mv(path, (err: any) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: "Error while uploading the document..." });
+      }
+    });
+
+    const doc = new Document(uploadedDoc.name + u.number, description, path, u);
+    if (!u.documents) {
+      u.documents = [];
+    }
+    u.documents.push(doc);
+    await userRepo.save(u);
+    await docRepo.save(doc);
+    return res
+      .status(201)
+      .json({ message: "Document uploaded successfully..." });
+
+    // save the doc
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error..." });
+  }
 };
 
 // const deleteDoc = async (req, res) => {
