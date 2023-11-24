@@ -15,7 +15,8 @@ export const updateUserStats = async (
     const user_id = req.params.user;
     const user: User | null = await userRepo.findOneBy({ id: user_id });
     if (!user) return res.status(404).json({ message: "User not found!" });
-    let { position, church, language, idNumber, name, email, number } = req.body;
+    let { position, church, language, idNumber, name, email, number } =
+      req.body;
 
     if (!user) {
       return res.status(404).json({ message: `User ${user_id} not found!` });
@@ -59,16 +60,16 @@ export const updateUserStats = async (
           return res.status(403).json({ message: "Position not allowed..." });
       }
     }
-   const updatedFiels: Partial<User> = {
-     name: name || user.name,
-     email: email || user.email,
-     church: church || user.church,
-     language: language || user.language,
-     number: number || user.number,
-     idNumber: idNumber || user.idNumber,
-   };
+    const updatedFiels: Partial<User> = {
+      name: name || user.name,
+      email: email || user.email,
+      church: church || user.church,
+      language: language || user.language,
+      number: number || user.number,
+      idNumber: idNumber || user.idNumber,
+    };
 
-     Object.assign(user, updatedFiels);
+    Object.assign(user, updatedFiels);
     await userRepo.save(user);
 
     return res.status(201).json({

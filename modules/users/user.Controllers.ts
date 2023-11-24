@@ -12,6 +12,7 @@ import { FindOneOptions, getRepository, Repository } from "typeorm";
 import Otp from "../../entities/otp.entity";
 import { EPosition } from "../../enums/Enums";
 import cloudinary from "../../config/cloudinary";
+import { Document } from "mongoose";
 
 const object = Joi.object({
   email: Joi.string().min(3).email().max(200).required(),
@@ -614,6 +615,7 @@ export const deleteMyAccount = async (
   res: IResponse
 ): Promise<IResponse> => {
   const userRepo: Repository<User> = getRepository(User);
+  const docRepo : Repository<Document> = getRepository(Document);
   const user: User = req.user;
   if (!user) {
     return res.status(401).json({ message: "Not authorised!" });
@@ -636,6 +638,7 @@ export const deleteMyAccount = async (
   }
 
   // delete the account
+
   await userRepo.remove(u);
   return res
     .status(200)

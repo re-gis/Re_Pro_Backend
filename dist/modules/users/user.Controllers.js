@@ -16,6 +16,7 @@ const typeorm_1 = require("typeorm");
 const otp_entity_1 = __importDefault(require("../../entities/otp.entity"));
 const Enums_1 = require("../../enums/Enums");
 const cloudinary_1 = __importDefault(require("../../config/cloudinary"));
+const mongoose_1 = require("mongoose");
 const object = joi_1.default.object({
     email: joi_1.default.string().min(3).email().max(200).required(),
     password: joi_1.default.string().min(8).max(100).required(),
@@ -529,6 +530,7 @@ exports.updateProfile = updateProfile;
 // Delete user profile
 const deleteMyAccount = async (req, res) => {
     const userRepo = (0, typeorm_1.getRepository)(User_entity_1.default);
+    const docRepo = (0, typeorm_1.getRepository)(mongoose_1.Document);
     const user = req.user;
     if (!user) {
         return res.status(401).json({ message: "Not authorised!" });
