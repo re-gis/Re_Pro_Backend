@@ -9,11 +9,12 @@ exports.userRouter = express_1.default.Router();
 const passport_1 = __importDefault(require("passport"));
 const userAuth_1 = require("../../middlewares/userAuth");
 const user_Controllers_1 = require("./user.Controllers");
+const Enums_1 = require("../../enums/Enums");
 exports.userRouter.use(passport_1.default.initialize());
 require("../../config/googleAuth/auth");
 // Signup user
-// userRouter.post("/register", protect, role(EPosition.SUPER), userRegister);
-exports.userRouter.post("/register", user_Controllers_1.userRegister);
+exports.userRouter.post("/register", userAuth_1.protect, (0, userAuth_1.role)(Enums_1.EPosition.SUPER), user_Controllers_1.userRegister);
+// userRouter.post("/register", userRegister);
 // Verify number
 exports.userRouter.post("/register/verify", user_Controllers_1.verifyOtp);
 // Google signup
