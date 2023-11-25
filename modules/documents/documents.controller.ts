@@ -113,9 +113,9 @@ export const getMyDocs = async (
 
 
 // delete document 
-export const deleteDoc= (req:IRequest, res:IResponse):Promise<IResponse> =>{
+// export const deleteDoc= (req:IRequest, res:IResponse):Promise<IResponse> =>{
   
-}
+// }
 
 
 

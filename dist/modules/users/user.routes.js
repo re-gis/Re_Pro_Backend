@@ -40,7 +40,7 @@ exports.userRouter.post("/profile/photo/upload", userAuth_1.protect, user_Contro
 // Remove profile pic
 exports.userRouter.put("/:user/profile/photo/remove", userAuth_1.protect, user_Controllers_1.profilePicRemove);
 // get any user profile
-exports.userRouter.get("/:user/my/profile", userAuth_1.protect, user_Controllers_1.getAnyUserProfile);
+exports.userRouter.get("/:user/profile", userAuth_1.protect, user_Controllers_1.getAnyUserProfile);
 // Get my profile
 exports.userRouter.get("/my/profile", userAuth_1.protect, user_Controllers_1.getUserProfile);
 // Update user profile

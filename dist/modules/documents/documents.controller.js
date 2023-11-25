@@ -72,7 +72,6 @@ const getMyDocs = async (req, res) => {
                 user: { id: user.id },
             },
         });
-        documents.map(doc => doc.user = user);
         console.log(documents);
         return res
             .status(200)
@@ -83,6 +82,9 @@ const getMyDocs = async (req, res) => {
     }
 };
 exports.getMyDocs = getMyDocs;
+// delete document 
+// export const deleteDoc= (req:IRequest, res:IResponse):Promise<IResponse> =>{
+// }
 //  unwanted
 // export const createDocument = async (
 //   req: IRequest,
@@ -135,45 +137,6 @@ exports.getMyDocs = getMyDocs;
 //     return res.status(500).json({ message: "Internal server error..." });
 //   }
 // };
-// // const deleteDoc = async (req, res) => {
-// //   if (!user) return res.status(400).send({ message: "User not found!" });
-// //   // Check if the name matches
-// //   if (user.name !== req.params.user)
-// //     return res.status(404).send({ message: "Cannot perform this action!" });
-// //   // Check if the user is a secretary
-// //   if (user.position.toLowerCase() !== "secretary")
-// //     return res.status(404).send({ message: "Cannot perform this action!" });
-// //   // Confirm deleting
-// //   const p = req.body.password;
-// //   const uP = user.password;
-// //   if (!p)
-// //     return res
-// //       .status(400)
-// //       .send({ message: "Please provide password to confirm..." });
-// //   // compare passwords
-// //   const vP = await bcrypt.compare(p, uP);
-// //   if (!vP)
-// //     return res.status(400).send({ message: "Invalid password provided!" });
-// //   // Select the doc
-// //   const sql = `SELECT * FROM documents WHERE doc_id = '${req.params.id}' AND church = '${user.church}'`;
-// //   conn.query(sql, async (err, data) => {
-// //     if (err)
-// //       return res.status(500).send({ message: "Internal server error..." });
-// //     if (data.length === 0)
-// //       return res.status(400).send({
-// //         message: `No doc in ${user.church} church found with ${req.params.id} id!`,
-// //       });
-// //     // delete the document
-// //     const sql = `DELETE FROM documents WHERE church = '${user.church}' AND doc_id = '${req.params.id}'`;
-// //     conn.query(sql, (err, result) => {
-// //       if (err) {
-// //         console.log(err);
-// //         return res.status(400).send({ message: "Error deleting document" });
-// //       }
-// //       res.send({ message: "Document deleted successfully" });
-// //     });
-// //   });
-// // };
 // // // Get my sent docs
 // export const getMyDocs = async (req:IRequest, res:IResponse) => {
 //   const docRepo: Repository<Document> = getRepository(Document);

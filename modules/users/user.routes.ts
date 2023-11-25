@@ -64,7 +64,7 @@ userRouter.post("/profile/photo/upload", protect, uploadPicture);
 userRouter.put("/:user/profile/photo/remove", protect, profilePicRemove);
 
 // get any user profile
-userRouter.get("/:user/my/profile", protect, getAnyUserProfile);
+userRouter.get("/:user/profile", protect, getAnyUserProfile);
 
 // Get my profile
 userRouter.get("/my/profile", protect, getUserProfile);
