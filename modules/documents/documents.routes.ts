@@ -1,6 +1,6 @@
 import express, { NextFunction } from "express";
 import { protect } from "../../middlewares/userAuth";
-import { createDocument, getMyDocs } from "./documents.controller";
+import { createDocument, deleteDoc, getMyDocs } from "./documents.controller";
 import { storage } from "../../config/Multer";
 import multer from "multer";
 import IRequest from "../../interfaces/IRequest";
@@ -24,20 +24,26 @@ const multerUpload: MulterRequestHandler = (req, res, next) => {
   (upload.single("document") as any)(req, res, next);
 };
 
-documentRouter.post("/upload", protect, createDocument);
 
-// Delete a document
-// documentRouter.delete("/:user/doc/:id/delete", protect, deleteDoc);
 
-// Get my sent documents
-documentRouter.get("/docs/sent/:user?", protect,getMyDocs);
+documentRouter.post("/upload",protect,createDocument)
+
+
+// unwanted
+// documentRouter.post("/upload", protect, createDocument);
+
+// // Delete a document
+documentRouter.delete("/:user/doc/:id/delete", protect, deleteDoc);
+
+// // Get my sent documents
+documentRouter.get("/docs/:user", protect,getMyDocs);
 
 // documentRouter.get("/:me/docs/sent", protect, getMyDocs);
 
-// Get received documents
-// documentRouter.get("/:me/docs/received", protect, getReceivedDocs);
+// // Get received documents
+// // documentRouter.get("/:me/docs/received", protect, getReceivedDocs);
 
-// Get all church docs
-// documentRouter.get("/all/docs", protect, getAllChurchDocs);
+// // Get all church docs
+// // documentRouter.get("/all/docs", protect, getAllChurchDocs);
 
-// module.exports = documentRouter;
+// // module.exports = documentRouter;
