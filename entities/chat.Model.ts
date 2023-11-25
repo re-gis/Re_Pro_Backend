@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import Message from "./message.entity";
-
-=======
 // const mongoose = require("mongoose")
 
 import { Column, JoinColumn, ManyToOne, OneToOne } from "typeorm";
@@ -44,7 +39,6 @@ const { Entity, PrimaryGeneratedColumn } = require("typeorm");
 // const Chat = mongoose.model("Chat", chatModel);
 // module.exports = Chat;
 
->>>>>>> main
 @Entity("chats")
 export default class Chat {
   @PrimaryGeneratedColumn()
@@ -70,8 +64,4 @@ export default class Chat {
     this.isGroupChat = isGroupChat;
     this.users = users;
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> main
