@@ -23,8 +23,8 @@ userRouter.use(passport.initialize());
 require("../../config/googleAuth/auth");
 
 // Signup user
-// userRouter.post("/register", protect, role(EPosition.SUPER), userRegister);
-userRouter.post("/register", userRegister);
+userRouter.post("/register", protect, role(EPosition.SUPER), userRegister);
+// userRouter.post("/register", userRegister);
 
 // Verify number
 userRouter.post("/register/verify", verifyOtp);

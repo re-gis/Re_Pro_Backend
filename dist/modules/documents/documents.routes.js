@@ -20,13 +20,15 @@ const multerUpload = (req, res, next) => {
     upload.single("document")(req, res, next);
 };
 exports.documentRouter.post("/upload", userAuth_1.protect, documents_controller_1.createDocument);
-// Delete a document
+// unwanted
+// documentRouter.post("/upload", protect, createDocument);
+// // Delete a document
 // documentRouter.delete("/:user/doc/:id/delete", protect, deleteDoc);
-// Get my sent documents
-exports.documentRouter.get("/docs/sent/:user?", userAuth_1.protect, documents_controller_1.getMyDocs);
+// // Get my sent documents
+exports.documentRouter.get("/docs/:user", userAuth_1.protect, documents_controller_1.getMyDocs);
 // documentRouter.get("/:me/docs/sent", protect, getMyDocs);
-// Get received documents
-// documentRouter.get("/:me/docs/received", protect, getReceivedDocs);
-// Get all church docs
-// documentRouter.get("/all/docs", protect, getAllChurchDocs);
-// module.exports = documentRouter;
+// // Get received documents
+// // documentRouter.get("/:me/docs/received", protect, getReceivedDocs);
+// // Get all church docs
+// // documentRouter.get("/all/docs", protect, getAllChurchDocs);
+// // module.exports = documentRouter;
