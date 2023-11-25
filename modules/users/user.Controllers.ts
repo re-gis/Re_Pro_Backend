@@ -58,7 +58,7 @@ export const userRegister = async (
   };
   try {
     const { email, number, password, name } = req.body;
-    let position:any = req.body.position;
+    let position: any = req.body.position;
     if (!email || !password || !number || !name || !position) {
       return res.status(400).json({ message: "All credentials are required!" });
     } else {
@@ -108,61 +108,60 @@ export const userRegister = async (
           //     .status(500)
           //     .json({ message: "Internal server error..." });
           // } else {
-            const hashedPass = bcryptjs.hashSync(password, 10);
-            // Save user
-            const profile: string =
-              "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fblank-profile-pic&psig=AOvVaw1kAh7UoZf3vqRdoN82Zab4&ust=1700721974142000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCMCRs56B14IDFQAAAAAdAAAAABAE";
+          const hashedPass = bcryptjs.hashSync(password, 10);
+          // Save user
+          const profile: string =
+            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fblank-profile-pic&psig=AOvVaw1kAh7UoZf3vqRdoN82Zab4&ust=1700721974142000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCMCRs56B14IDFQAAAAAdAAAAABAE";
 
+          let ps: string = position.toLowerCase();
+          switch (ps) {
+            case "secretary":
+              position = EPosition.SECRETARY;
+              break;
 
-              let ps: string = position.toLowerCase();
-              switch (ps) {
-                case "secretary":
-                  position = EPosition.SECRETARY;
-                  break;
+            case "bishop":
+              position = EPosition.BISHOP;
+              break;
 
-                case "bishop":
-                  position = EPosition.BISHOP;
-                  break;
+            case "pastor":
+              position = EPosition.PASTOR;
+              break;
 
-                case "pastor":
-                  position = EPosition.PASTOR;
-                  break;
+            case "admin":
+              position = EPosition.SUPER;
+              break;
 
-                case "admin":
-                  position = EPosition.SUPER;
-                  break;
+            case "evangelist":
+              position = EPosition.EVANGELIST;
+              break;
 
-                case "evangelist":
-                  position = EPosition.EVANGELIST;
-                  break;
+            case "human resource":
+              position = EPosition.HUMRE;
+              break;
 
-                case "human resource":
-                  position = EPosition.HUMRE;
-                  break;
+            case "pos":
+              position = EPosition.POs;
+              break;
 
-                case "pos":
-                  position = EPosition.POs;
-                  break;
+            case "super":
+              position = EPosition.SUPER;
+              break;
 
-                case "super":
-                  position = EPosition.SUPER;
-                  break;
+            default:
+              return res
+                .status(403)
+                .json({ message: "Position not allowed..." });
+          }
 
-                default:
-                  return res
-                    .status(403)
-                    .json({ message: "Position not allowed..." });
-              }
+          const user = new User(email, hashedPass, number, name, profile);
+          user.position = position;
+          // Save user
+          await userRepo.save(user);
+          await otpRepo.save(otp);
 
-            const user = new User(email, hashedPass, number, name, profile);
-            user.position = position
-            // Save user
-            await userRepo.save(user);
-            await otpRepo.save(otp);
-
-            return res.status(201).json({
-              message: "User registered successfully, verify to continue...",
-            });
+          return res.status(201).json({
+            message: "User registered successfully, verify to continue...",
+          });
           // }
         }
       }
@@ -226,8 +225,8 @@ export const updateUserStats = async (
     return res.status(401).json({ message: "Not authorised!" });
   }
   try {
-    let { position, church, language, idNumber } = req.body;
-    if (!position || !church || !language || !idNumber) {
+    let { church, language, idNumber } = req.body;
+    if (!church || !language || !idNumber) {
       return res.status(400).json({ message: "All inputs are required!" });
     } else {
       // Get user to update
@@ -240,44 +239,7 @@ export const updateUserStats = async (
           .status(404)
           .json({ message: `User ${user.email} not found!` });
       }
-      let ps: string = position.toLowerCase();
-      switch (ps) {
-        case "secretary":
-          position = EPosition.SECRETARY;
-          break;
-
-        case "bishop":
-          position = EPosition.BISHOP;
-          break;
-
-        case "pastor":
-          position = EPosition.PASTOR;
-          break;
-
-        case "admin":
-          position = EPosition.SUPER;
-          break;
-
-        case "evangelist":
-          position = EPosition.EVANGELIST;
-          break;
-
-        case "human resource":
-          position = EPosition.HUMRE;
-          break;
-
-        case "pos":
-          position = EPosition.POs;
-          break;
-
-        case "super":
-          position = EPosition.SUPER;
-          break;
-
-        default:
-          return res.status(403).json({ message: "Position not allowed..." });
-      }
-      euser.position = position;
+      
       euser.church = church;
       euser.language = language;
       euser.idNumber = idNumber;
@@ -615,7 +577,7 @@ export const deleteMyAccount = async (
   res: IResponse
 ): Promise<IResponse> => {
   const userRepo: Repository<User> = getRepository(User);
-  const docRepo : Repository<Document> = getRepository(Document);
+  const docRepo: Repository<Document> = getRepository(Document);
   const user: User = req.user;
   if (!user) {
     return res.status(401).json({ message: "Not authorised!" });
