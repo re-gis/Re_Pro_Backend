@@ -1,9 +1,9 @@
-export  enum EPosition {
-    SUPER,
-    PASTOR,
-    SECRETARY,
-    BISHOP,
-    EVANGELIST,
-    POs,
-    HUMRE
+export enum EPosition {
+    SUPER = "SUPER",
+    PASTOR = "PASTOR",
+    SECRETARY = "SECRETARY",
+    BISHOP = "BISHOP",
+    EVANGELIST = "EVANGELIST",
+    POs = "POs",
+    HUMRE = "HUMRE"
 }

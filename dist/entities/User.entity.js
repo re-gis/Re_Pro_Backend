@@ -48,7 +48,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "number", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "varchar", nullable: false }),
+    (0, typeorm_1.Column)({ type: "varchar", nullable: false, unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "name", void 0);
 __decorate([
@@ -73,7 +73,7 @@ __decorate([
 ], User.prototype, "verified", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], User.prototype, "position", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
@@ -85,6 +85,6 @@ __decorate([
 ], User.prototype, "documents", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)("users"),
-    __metadata("design:paramtypes", [String, String, String, String, String, String, String, String, Boolean, Number, String])
+    __metadata("design:paramtypes", [String, String, String, String, String, String, String, String, Boolean, String, String])
 ], User);
 exports.default = User;

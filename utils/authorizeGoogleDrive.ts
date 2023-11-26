@@ -30,7 +30,7 @@ export const uploadFileToGoogleDrive = async (
 
     const fileMetaData = {
       name: "vista", // Set your desired file name here
-      parents: ["1bWETCDUpJLif4Qpdq35MT9tetaDFqoMr"],
+      parents: ["1cQ8GpXCPIo-JDLoWAt7CnI0-7w_oANJn"],
     };
 
     const file = await drive.files.create({
@@ -46,9 +46,29 @@ export const uploadFileToGoogleDrive = async (
     return fileUrl || ""
   } catch (error) {
     console.error(error);
-    return "error have occured during uploading file"
-  }
+throw new Error(" error have occured while uploading file " + filePath)  
+}
 };
+
+
+
+
+export const deleteFileFromGoogleDrive = async(fileId:string,authClient:any) :Promise<String | undefined >=>{
+   try {
+
+    const drive = google.drive({ version: "v3", auth: authClient });
+    
+     await  drive.files.delete({
+        fileId: fileId,
+    })
+
+    return " file have been deleted successfully"
+   } catch (error) {
+    console.log(error);
+    throw new Error(" error have occured while deleting file with this id : " + fileId)
+   }
+   
+}
 
 
 //  modifying webContentLink
@@ -60,7 +80,14 @@ export const uploadFileToGoogleDrive = async (
     const finalLink = cleanLink.replace(/[?&]$/, '');
   
     return finalLink;
+}
+
+
+
+//  extract id of file
+  
+  
+export function extractFileIdFromUrl(url: string): string {
+    const match = url.match(/(?:\/d\/|id=)([\w-]+)/);
+    return match ? match[1] :"";
   }
-  
-  
-  

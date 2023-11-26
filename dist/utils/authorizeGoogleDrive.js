@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getViewLink = exports.uploadFileToGoogleDrive = exports.authorizeGoogleDrive = void 0;
+exports.extractFileIdFromUrl = exports.getViewLink = exports.deleteFileFromGoogleDrive = exports.uploadFileToGoogleDrive = exports.authorizeGoogleDrive = void 0;
 const googleapis_1 = require("googleapis");
 const apiKey = __importStar(require("../apikey.json"));
 const fs_1 = __importDefault(require("fs"));
@@ -45,7 +45,7 @@ const uploadFileToGoogleDrive = async (authClient, filePath) => {
         const drive = googleapis_1.google.drive({ version: "v3", auth: authClient });
         const fileMetaData = {
             name: "vista", // Set your desired file name here
-            parents: ["1bWETCDUpJLif4Qpdq35MT9tetaDFqoMr"],
+            parents: ["1cQ8GpXCPIo-JDLoWAt7CnI0-7w_oANJn"],
         };
         const file = await drive.files.create({
             media: {
@@ -64,6 +64,20 @@ const uploadFileToGoogleDrive = async (authClient, filePath) => {
     }
 };
 exports.uploadFileToGoogleDrive = uploadFileToGoogleDrive;
+const deleteFileFromGoogleDrive = async (fileId, authClient) => {
+    try {
+        const drive = googleapis_1.google.drive({ version: "v3", auth: authClient });
+        await drive.files.delete({
+            fileId: fileId,
+        });
+        return " file have been deleted successfully";
+    }
+    catch (error) {
+        console.log(error);
+        return "err have occured";
+    }
+};
+exports.deleteFileFromGoogleDrive = deleteFileFromGoogleDrive;
 //  modifying webContentLink
 function getViewLink(driveLink) {
     // Remove the export=download parameter, if present
@@ -73,3 +87,9 @@ function getViewLink(driveLink) {
     return finalLink;
 }
 exports.getViewLink = getViewLink;
+//  extract id of file
+function extractFileIdFromUrl(url) {
+    const match = url.match(/(?:\/d\/|id=)([\w-]+)/);
+    return match ? match[1] : "";
+}
+exports.extractFileIdFromUrl = extractFileIdFromUrl;

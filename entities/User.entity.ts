@@ -23,7 +23,7 @@ export default class User {
   @Column({ type: "varchar", nullable: false })
   number: string;
 
-  @Column({ type: "varchar", nullable: false })
+  @Column({ type: "varchar", nullable: false,unique:true })
   name: string;
 
   @Column({ type: "varchar", nullable: true })

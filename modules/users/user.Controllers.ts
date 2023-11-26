@@ -152,7 +152,6 @@ export const userRegister = async (
                 .status(403)
                 .json({ message: "Position not allowed..." });
           }
-
           const user = new User(email, hashedPass, number, name, profile);
           user.position = position;
           // Save user
