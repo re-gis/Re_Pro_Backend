@@ -194,8 +194,8 @@ const updateUserStats = async (req, res) => {
         return res.status(401).json({ message: "Not authorised!" });
     }
     try {
-        let { position, church, language, idNumber } = req.body;
-        if (!position || !church || !language || !idNumber) {
+        let { church, language, idNumber } = req.body;
+        if (!church || !language || !idNumber) {
             return res.status(400).json({ message: "All inputs are required!" });
         }
         else {
@@ -208,36 +208,6 @@ const updateUserStats = async (req, res) => {
                     .status(404)
                     .json({ message: `User ${user.email} not found!` });
             }
-            let ps = position.toLowerCase();
-            switch (ps) {
-                case "secretary":
-                    position = Enums_1.EPosition.SECRETARY;
-                    break;
-                case "bishop":
-                    position = Enums_1.EPosition.BISHOP;
-                    break;
-                case "pastor":
-                    position = Enums_1.EPosition.PASTOR;
-                    break;
-                case "admin":
-                    position = Enums_1.EPosition.SUPER;
-                    break;
-                case "evangelist":
-                    position = Enums_1.EPosition.EVANGELIST;
-                    break;
-                case "human resource":
-                    position = Enums_1.EPosition.HUMRE;
-                    break;
-                case "pos":
-                    position = Enums_1.EPosition.POs;
-                    break;
-                case "super":
-                    position = Enums_1.EPosition.SUPER;
-                    break;
-                default:
-                    return res.status(403).json({ message: "Position not allowed..." });
-            }
-            euser.position = position;
             euser.church = church;
             euser.language = language;
             euser.idNumber = idNumber;

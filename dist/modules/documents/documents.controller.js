@@ -83,6 +83,7 @@ const getMyDocs = async (req, res) => {
     }
 };
 exports.getMyDocs = getMyDocs;
+<<<<<<< HEAD
 // delete document
 const deleteDoc = async (req, res) => {
     const userRepo = (0, typeorm_1.getRepository)(User_entity_1.default);
@@ -135,6 +136,11 @@ const deleteDoc = async (req, res) => {
     }
 };
 exports.deleteDoc = deleteDoc;
+=======
+// delete document 
+// export const deleteDoc= (req:IRequest, res:IResponse):Promise<IResponse> =>{
+// }
+>>>>>>> main
 //  unwanted
 // export const createDocument = async (
 //   req: IRequest,
