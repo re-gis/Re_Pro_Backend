@@ -23,10 +23,10 @@ exports.documentRouter.post("/upload", userAuth_1.protect, documents_controller_
 // unwanted
 // documentRouter.post("/upload", protect, createDocument);
 // // Delete a document
-// // documentRouter.delete("/:user/doc/:id/delete", protect, deleteDoc);
+exports.documentRouter.delete("/:user/doc/:id/delete", userAuth_1.protect, documents_controller_1.deleteDoc);
 // // Get my sent documents
 exports.documentRouter.get("/docs/:user", userAuth_1.protect, documents_controller_1.getMyDocs);
-// // documentRouter.get("/:me/docs/sent", protect, getMyDocs);
+// documentRouter.get("/:me/docs/sent", protect, getMyDocs);
 // // Get received documents
 // // documentRouter.get("/:me/docs/received", protect, getReceivedDocs);
 // // Get all church docs

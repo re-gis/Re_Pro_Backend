@@ -4,10 +4,14 @@ import IResponse from "../../interfaces/IResponse";
 import User from "../../entities/User.entity";
 import {
   authorizeGoogleDrive,
+  deleteFileFromGoogleDrive,
+  extractFileIdFromUrl,
   getViewLink,
   uploadFileToGoogleDrive,
 } from "../../utils/authorizeGoogleDrive";
 import Document from "../../entities/document.entity";
+import { EPosition } from "../../enums/Enums";
+import e from "express";
 
 //  create document and save it
 export const createDocument = async (
@@ -75,9 +79,9 @@ export const createDocument = async (
     await docRepo.save(doc);
 
     return res.status(200).json({ message: "Document saved successfully." });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in createDocument:", error);
-    return res.status(500).json({ message: "Internal server error." });
+    return res.status(500).json({ message: "Internal server error." + error.message });
   }
 };
 
@@ -102,7 +106,7 @@ export const getMyDocs = async (
       },
     });
     console.log(documents);
-    
+
     return res
       .status(200)
       .json({ message: "successfully fetched", documents: documents });
@@ -111,13 +115,87 @@ export const getMyDocs = async (
   }
 };
 
+// delete document
+export const deleteDoc = async (
+  req: IRequest,
+  res: IResponse
+): Promise<IResponse> => {
+  try{
 
-// delete document 
-export const deleteDoc= (req:IRequest, res:IResponse):Promise<IResponse> =>{
+ 
+  const userRepo: Repository<User> = getRepository(User);
+  const docRepo: Repository<Document> = getRepository(Document);
+  const user: User = req.user;
+  const userName: string = req.params.user;
+  const docId = parseInt(req.params.id);
+  console.log(userName, docId);
+
+  if (!user) {
+    return res.status(401).json({ message: "Please log in to continue." });
+  }
+
+  const userInRepo = await userRepo.findOne({
+    where: { name:userName },
+    relations: ["documents"],
+  });
+
+  console.log(userInRepo);
+
   
+  if (!userInRepo) {
+    return res.status(404).json({ message: "User not found." });
+  }
+
+
+
+   //  check if doc is found in the repository
+   const docToDelete = await docRepo.findOne({
+    where: { id: docId },
+    relations: ["user"],
+  });
+  
+   if (!docToDelete) {
+     return res.status(404).json({ message: "Document not found" });
+   }
+
+   console.log(user.id , docToDelete.user.id);
+   
+
+  // Check if the user is authorized to delete the document
+  if 
+  (  userInRepo.position == EPosition.SUPER ||
+    userInRepo.position == EPosition.SECRETARY ||
+    user.id == docToDelete.user.id
+  ) {
+      //  extract fileId form usrl
+
+  const fileId = extractFileIdFromUrl(docToDelete.filepath);
+  //  delete document id db
+  await docRepo.remove(docToDelete);
+
+  //   delete document in google drive
+  const authClient = await authorizeGoogleDrive();
+  await deleteFileFromGoogleDrive(fileId, authClient);
+
+
+  //  update user 
+  userInRepo.documents = userInRepo.documents.filter((doc) => doc.id != docToDelete.id);
+  await userRepo.save(userInRepo);
+  return res.status(200).json({ message: "document have been deleted successfully" });
+   } else if(userInRepo?.id != user.id) {
+    return res.status(404).json({ message: "please login to continue" });
+
+  } else{
+    return res.status(401).json({ message: "You are not authorized to perform this action." });
+  }
+
+}catch (error:any) {
+  console.error("Error in createDocument:", error);
+  return res.status(500).json({ message: "Internal server error." + error.message });
 }
 
 
+};
 
 //  unwanted
 
@@ -179,8 +257,6 @@ export const deleteDoc= (req:IRequest, res:IResponse):Promise<IResponse> =>{
 //     return res.status(500).json({ message: "Internal server error..." });
 //   }
 // };
-
-
 
 // // // Get my sent docs
 // export const getMyDocs = async (req:IRequest, res:IResponse) => {
