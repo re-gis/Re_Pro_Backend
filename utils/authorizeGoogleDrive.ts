@@ -4,7 +4,6 @@ import fs from "fs";
 
 const SCOPE = ["https://www.googleapis.com/auth/drive"];
 
-
 //  authorization for google creadentials
 export async function authorizeGoogleDrive() {
   const jwtClient = new google.auth.JWT(
@@ -17,14 +16,12 @@ export async function authorizeGoogleDrive() {
   return jwtClient;
 }
 
-
-
 //  uploading to google drive function
 
 export const uploadFileToGoogleDrive = async (
   authClient: any,
   filePath: string
-): Promise<string > => {
+): Promise<string> => {
   try {
     const drive = google.drive({ version: "v3", auth: authClient });
 
@@ -43,51 +40,47 @@ export const uploadFileToGoogleDrive = async (
 
     //  url with download option
     const fileUrl = file.data?.webContentLink;
-    return fileUrl || ""
+    return fileUrl || "";
   } catch (error) {
     console.error(error);
-throw new Error(" error have occured while uploading file " + filePath)  
-}
+    throw new Error(" error have occured while uploading file " + filePath);
+  }
 };
 
-
-
-
-export const deleteFileFromGoogleDrive = async(fileId:string,authClient:any) :Promise<String | undefined >=>{
-   try {
-
+export const deleteFileFromGoogleDrive = async (
+  fileId: string,
+  authClient: any
+): Promise<String | undefined> => {
+  try {
     const drive = google.drive({ version: "v3", auth: authClient });
-    
-     await  drive.files.delete({
-        fileId: fileId,
-    })
 
-    return " file have been deleted successfully"
-   } catch (error) {
+    await drive.files.delete({
+      fileId: fileId,
+    });
+
+    return " file have been deleted successfully";
+  } catch (error) {
     console.log(error);
-    throw new Error(" error have occured while deleting file with this id : " + fileId)
-   }
-   
-}
-
+    throw new Error(
+      " error have occured while deleting file with this id : " + fileId
+    );
+  }
+};
 
 //  modifying webContentLink
- export function getViewLink(driveLink: string ) {
-    // Remove the export=download parameter, if present
-    const cleanLink = driveLink.replace(/&export=download/g, '');
-  
-    // If the link ends with '?' or '&', remove it
-    const finalLink = cleanLink.replace(/[?&]$/, '');
-  
-    return finalLink;
+export function getViewLink(driveLink: string) {
+  // Remove the export=download parameter, if present
+  const cleanLink = driveLink.replace(/&export=download/g, "");
+
+  // If the link ends with '?' or '&', remove it
+  const finalLink = cleanLink.replace(/[?&]$/, "");
+
+  return finalLink;
 }
 
-
-
 //  extract id of file
-  
-  
+
 export function extractFileIdFromUrl(url: string): string {
-    const match = url.match(/(?:\/d\/|id=)([\w-]+)/);
-    return match ? match[1] :"";
-  }
+  const match = url.match(/(?:\/d\/|id=)([\w-]+)/);
+  return match ? match[1] : "";
+}

@@ -9,12 +9,11 @@ exports.userRouter = express_1.default.Router();
 const passport_1 = __importDefault(require("passport"));
 const userAuth_1 = require("../../middlewares/userAuth");
 const user_Controllers_1 = require("./user.Controllers");
-const Enums_1 = require("../../enums/Enums");
 exports.userRouter.use(passport_1.default.initialize());
 require("../../config/googleAuth/auth");
 // Signup user
-exports.userRouter.post("/register", userAuth_1.protect, (0, userAuth_1.role)(Enums_1.EPosition.SUPER), user_Controllers_1.userRegister);
-// userRouter.post("/register", userRegister);
+// userRouter.post("/register", protect, role(EPosition.SUPER), userRegister);
+exports.userRouter.post("/register", user_Controllers_1.userRegister);
 // Verify number
 exports.userRouter.post("/register/verify", user_Controllers_1.verifyOtp);
 // Google signup
@@ -28,25 +27,25 @@ exports.userRouter.get("/google/callback", passport_1.default.authenticate("goog
     }
 }));
 // Update user stats
-exports.userRouter.put("/register/update", userAuth_1.protect, user_Controllers_1.updateUserStats);
+exports.userRouter.put("/register/update", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.updateUserStats);
 // Login user
-exports.userRouter.post("/login", user_Controllers_1.loginUser);
+exports.userRouter.post("/login", (0, userAuth_1.isVerified)(), user_Controllers_1.loginUser);
 // Forgot password
-exports.userRouter.post("/password/forgot", userAuth_1.protect, user_Controllers_1.forgotPassword);
+exports.userRouter.post("/password/forgot", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.forgotPassword);
 // Reset password
-exports.userRouter.post("/password/reset", userAuth_1.protect, user_Controllers_1.resetPassword);
+exports.userRouter.post("/password/reset", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.resetPassword);
 // Upload profile picture
-exports.userRouter.post("/profile/photo/upload", userAuth_1.protect, user_Controllers_1.uploadPicture);
+exports.userRouter.post("/profile/photo/upload", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.uploadPicture);
 // Remove profile pic
-exports.userRouter.put("/:user/profile/photo/remove", userAuth_1.protect, user_Controllers_1.profilePicRemove);
+exports.userRouter.put("/:user/profile/photo/remove", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.profilePicRemove);
 // get any user profile
-exports.userRouter.get("/:user/profile", userAuth_1.protect, user_Controllers_1.getAnyUserProfile);
+exports.userRouter.get("/:user/profile", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.getAnyUserProfile);
 // Get my profile
-exports.userRouter.get("/my/profile", userAuth_1.protect, user_Controllers_1.getUserProfile);
+exports.userRouter.get("/my/profile", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.getUserProfile);
 // Update user profile
-exports.userRouter.put("/profile/update", userAuth_1.protect, user_Controllers_1.updateProfile);
+exports.userRouter.put("/profile/update", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.updateProfile);
 // Delete account
-exports.userRouter.delete("/profile/delete", userAuth_1.protect, user_Controllers_1.deleteMyAccount);
+exports.userRouter.delete("/profile/delete", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.deleteMyAccount);
 // Get total workers
 // userRouter.get("/workers", getTotalWorkers);
 // Get pastors

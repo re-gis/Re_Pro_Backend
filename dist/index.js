@@ -16,6 +16,7 @@ const typeorm_1 = require("typeorm");
 const db_1 = require("./config/mongodb/db");
 const admin_routes_1 = require("./modules/admin/admin.routes");
 const documents_routes_1 = require("./modules/documents/documents.routes");
+const chat_routes_1 = require("./modules/chats/chat.routes");
 // Fileuploader
 app.use((0, express_fileupload_1.default)({
     useTempFiles: true,
@@ -45,7 +46,7 @@ app.use("/api/admin", admin_routes_1.adminRouter);
 // Currency apis
 // app.use("/api/currency", currencyRouter);
 // Room chat apis
-// app.use("/api/chat", require("./routes/chat.routes"));
+app.use("/api/chat", chat_routes_1.chatRouter);
 const server = app.listen(process.env.PORT, () => {
     console.log(`server listening port ${process.env.PORT}`);
 });
