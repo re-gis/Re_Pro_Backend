@@ -130,7 +130,6 @@ const userRegister = async (req, res) => {
                                 .status(403)
                                 .json({ message: "Position not allowed..." });
                     }
-                    console.log(position);
                     const user = new User_entity_1.default(email, hashedPass, number, name, profile);
                     user.position = position;
                     // Save user

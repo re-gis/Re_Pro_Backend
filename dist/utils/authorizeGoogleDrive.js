@@ -60,7 +60,7 @@ const uploadFileToGoogleDrive = async (authClient, filePath) => {
     }
     catch (error) {
         console.error(error);
-        return "error have occured during uploading file";
+        throw new Error(" error have occured while uploading file " + filePath);
     }
 };
 exports.uploadFileToGoogleDrive = uploadFileToGoogleDrive;
@@ -74,7 +74,7 @@ const deleteFileFromGoogleDrive = async (fileId, authClient) => {
     }
     catch (error) {
         console.log(error);
-        return "err have occured";
+        throw new Error(" error have occured while deleting file with this id : " + fileId);
     }
 };
 exports.deleteFileFromGoogleDrive = deleteFileFromGoogleDrive;
