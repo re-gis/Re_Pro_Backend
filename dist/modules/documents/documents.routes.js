@@ -23,7 +23,7 @@ exports.documentRouter.post("/upload", userAuth_1.protect, (0, userAuth_1.isVeri
 // unwanted
 // documentRouter.post("/upload", protect, createDocument);
 // // Delete a document
-// documentRouter.delete("/:user/doc/:id/delete", protect, deleteDoc);
+exports.documentRouter.delete("/:user/doc/:id/delete", userAuth_1.protect, (0, userAuth_1.isVerified)(), documents_controller_1.deleteDoc);
 // // Get my sent documents
 exports.documentRouter.get("/docs/:user", userAuth_1.protect, (0, userAuth_1.isVerified)(), documents_controller_1.getMyDocs);
 // documentRouter.get("/:me/docs/sent", protect, getMyDocs);

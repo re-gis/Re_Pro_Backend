@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMyDocs = exports.createDocument = void 0;
+exports.deleteDoc = exports.getMyDocs = exports.createDocument = void 0;
 const typeorm_1 = require("typeorm");
 const User_entity_1 = __importDefault(require("../../entities/User.entity"));
 const authorizeGoogleDrive_1 = require("../../utils/authorizeGoogleDrive");
 const document_entity_1 = __importDefault(require("../../entities/document.entity"));
+const Enums_1 = require("../../enums/Enums");
 //  create document and save it
 const createDocument = async (req, res) => {
     try {
@@ -82,7 +83,58 @@ const getMyDocs = async (req, res) => {
     }
 };
 exports.getMyDocs = getMyDocs;
-// delete document 
+// delete document
+const deleteDoc = async (req, res) => {
+    const userRepo = (0, typeorm_1.getRepository)(User_entity_1.default);
+    const docRepo = (0, typeorm_1.getRepository)(document_entity_1.default);
+    const user = req.user;
+    const userName = req.params.user;
+    const docId = parseInt(req.params.id);
+    console.log(userName, docId);
+    if (!user) {
+        return res.status(401).json({ message: "Please log in to continue." });
+    }
+    const userInRepo = await userRepo.findOne({
+        where: { name: userName },
+        relations: ["documents"],
+    });
+    console.log(userInRepo);
+    if (!userInRepo) {
+        return res.status(404).json({ message: "User not found." });
+    }
+    //  check if doc is found in the repository
+    const docToDelete = await docRepo.findOne({
+        where: { id: docId },
+        relations: ["user"],
+    });
+    if (!docToDelete) {
+        return res.status(404).json({ message: "Document not found" });
+    }
+    console.log(user.id, docToDelete.user.id);
+    // Check if the user is authorized to delete the document
+    if (userInRepo.position == Enums_1.EPosition.SUPER ||
+        userInRepo.position == Enums_1.EPosition.SECRETARY ||
+        user.id == docToDelete.user.id) {
+        //  extract fileId form usrl
+        const fileId = (0, authorizeGoogleDrive_1.extractFileIdFromUrl)(docToDelete.filepath);
+        //  delete document id db
+        await docRepo.remove(docToDelete);
+        //   delete document in google drive
+        const authClient = await (0, authorizeGoogleDrive_1.authorizeGoogleDrive)();
+        await (0, authorizeGoogleDrive_1.deleteFileFromGoogleDrive)(fileId, authClient);
+        //  update user 
+        userInRepo.documents = userInRepo.documents.filter((doc) => doc.id == docId);
+        await userRepo.save(userInRepo);
+        return res.status(200).json({ message: "document have been deleted successfully" });
+    }
+    else if ((userInRepo === null || userInRepo === void 0 ? void 0 : userInRepo.id) != user.id) {
+        return res.status(404).json({ message: "please login to continue" });
+    }
+    else {
+        return res.status(401).json({ message: "You are not authorized to perform this action." });
+    }
+};
+exports.deleteDoc = deleteDoc;
 //  unwanted
 // export const createDocument = async (
 //   req: IRequest,
