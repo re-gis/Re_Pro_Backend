@@ -1,7 +1,7 @@
 import express from "express";
 export const userRouter = express.Router();
 import passport from "passport";
-import { protect, role } from "../../middlewares/userAuth";
+import { isVerified, protect, role } from "../../middlewares/userAuth";
 import {
   deleteMyAccount,
   forgotPassword,
@@ -16,15 +16,14 @@ import {
   userRegister,
   verifyOtp,
 } from "./user.Controllers";
-import { EPosition } from "../../enums/Enums";
 
 userRouter.use(passport.initialize());
 
 require("../../config/googleAuth/auth");
 
 // Signup user
-userRouter.post("/register", protect, role(EPosition.SUPER), userRegister);
-// userRouter.post("/register", userRegister);
+// userRouter.post("/register", protect, role(EPosition.SUPER), userRegister);
+userRouter.post("/register", userRegister);
 
 // Verify number
 userRouter.post("/register/verify", verifyOtp);
@@ -46,34 +45,39 @@ userRouter.get(
 );
 
 // Update user stats
-userRouter.put("/register/update", protect, updateUserStats);
+userRouter.put("/register/update", protect, isVerified, updateUserStats);
 
 // Login user
-userRouter.post("/login", loginUser);
+userRouter.post("/login", isVerified, loginUser);
 
 // Forgot password
-userRouter.post("/password/forgot", protect, forgotPassword);
+userRouter.post("/password/forgot", protect, isVerified, forgotPassword);
 
 // Reset password
-userRouter.post("/password/reset", protect, resetPassword);
+userRouter.post("/password/reset", protect, isVerified, resetPassword);
 
 // Upload profile picture
-userRouter.post("/profile/photo/upload", protect, uploadPicture);
+userRouter.post("/profile/photo/upload", protect, isVerified, uploadPicture);
 
 // Remove profile pic
-userRouter.put("/:user/profile/photo/remove", protect, profilePicRemove);
+userRouter.put(
+  "/:user/profile/photo/remove",
+  protect,
+  isVerified,
+  profilePicRemove
+);
 
 // get any user profile
-userRouter.get("/:user/profile", protect, getAnyUserProfile);
+userRouter.get("/:user/profile", protect, isVerified, getAnyUserProfile);
 
 // Get my profile
-userRouter.get("/my/profile", protect, getUserProfile);
+userRouter.get("/my/profile", protect, isVerified, getUserProfile);
 
 // Update user profile
-userRouter.put("/profile/update", protect, updateProfile);
+userRouter.put("/profile/update", protect, isVerified, updateProfile);
 
 // Delete account
-userRouter.delete("/profile/delete", protect, deleteMyAccount);
+userRouter.delete("/profile/delete", protect, isVerified, deleteMyAccount);
 
 // Get total workers
 // userRouter.get("/workers", getTotalWorkers);

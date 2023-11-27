@@ -52,7 +52,7 @@ export const protect = async (
           church: user.church,
           position: user.position,
           verified: user.verified,
-          documents:user.documents
+          documents: user.documents,
         };
 
         next();
@@ -70,12 +70,22 @@ export const protect = async (
 
 export const role = (...roles: EPosition[]) => {
   return (req: IRequest, res: IResponse, next: NextFunction) => {
-     console.log(roles)
-     console.log(req.user.position)
     if (roles[0] != req.user.position) {
       return res
         .status(403)
         .json({ message: "You are not authorised to perform this action..." });
+    } else {
+      next();
+    }
+  };
+};
+
+export const isVerified = () => {
+  return (req: IRequest, res: IResponse, next: NextFunction) => {
+    if (req.user.verified != true) {
+      return res
+        .status(403)
+        .json({ message: "Verify the account to continue..." });
     } else {
       next();
     }

@@ -13,6 +13,7 @@ import { createConnection } from "typeorm";
 import { connectDatabase } from "./config/mongodb/db";
 import { adminRouter } from "./modules/admin/admin.routes";
 import { documentRouter } from "./modules/documents/documents.routes";
+import { chatRouter } from "./modules/chats/chat.routes";
 // Fileuploader
 app.use(
   fileUploader({
@@ -56,7 +57,7 @@ app.use("/api/admin", adminRouter);
 // app.use("/api/currency", currencyRouter);
 
 // Room chat apis
-// app.use("/api/chat", require("./routes/chat.routes"));
+app.use("/api/chat", chatRouter);
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`server listening port ${process.env.PORT}`);

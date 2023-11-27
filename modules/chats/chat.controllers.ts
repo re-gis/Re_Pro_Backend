@@ -1,60 +1,68 @@
-// const mysql = require("mysql");
+import { Repository, getRepository } from "typeorm";
+import User from "../../entities/User.entity";
+import { Chat } from "../../entities/chat.Model";
+import IRequest from "../../interfaces/IRequest";
+import IResponse from "../../interfaces/IResponse";
 
-// // const { Chat } = require("../models/chat.Model");
-// const conn = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "re_pro",
-// });
+export const accessChat = async (req: IRequest, res: IResponse) => {
+  try {
+    const userRepo: Repository<User> = getRepository(User);
+    const { userNum } = req.body;
+    const user: User = req.user;
+    const lU = await userRepo.findOne({ where: { email: user.email } });
+    if (!lU) return res.status(404).json({ message: "User nto found!" });
+    if (!userNum) return res.status(400).json({ message: "No user number!" });
 
-// const Chat = require("../models/chat.Model");
+    // check if user is valid
+    const euser = await userRepo.findOne({ where: { number: userNum } });
+    if (!euser) {
+      return res.status(404).json({ message: `User ${userNum} not found!` });
+    }
+    let isChat = await Chat.find({
+      isGroupChat: false,
+      $and: [
+        { users: { $elemMatch: { $eq: lU.number } } },
+        { users: { $elemMatch: { $eq: userNum } } },
+      ],
+    });
 
-// const accessChat = async (req, res) => {
-//   try {
-//     const { userNum } = req.body;
-//     if (!userNum) return res.status(400).send({ message: "No user number!" });
-//     let isChat = await Chat.find({
-//       isGroupChat: false,
-//       $and: [
-//         { users: { $elemMatch: { $eq: user.number } } },
-//         { users: { $elemMatch: { $eq: userNum } } },
-//       ],
-//     });
+    if (isChat.length === 0) {
+      const name: string = lU.name;
+      // Create a new chat
+      const newChat = new Chat({
+        users: [lU.number, userNum],
+        groupAdmin: lU.number,
+      });
+      await newChat.save();
+      return res.status(200).json({ chat: newChat });
+    }
 
-//     if (isChat.length === 0) {
-//       const name = user.name;
-//       // Create a new chat
-//       const newChat = new Chat({
-//         users: [user.number, userNum],
-//         groupAdmin: user.number,
-//       });
-//       await newChat.save();
-//       isChat = newChat;
-//       return res.status(200).send({ chat: isChat });
-//     }
+    return res.status(200).json({ chat: isChat });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error..." });
+  }
+};
 
-//     return res.status(200).send({ chat: isChat });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).send({ message: "Internal server error..." });
-//   }
-// };
+export const fetchMyChats = async (req: IRequest, res: IResponse) => {
+  try {
+    const userRepo: Repository<User> = getRepository(User);
+    const user: User = req.user;
+    const lU = await userRepo.findOne({ where: { email: user.email } });
+    if (!lU) return res.status(404).json({ message: "User not found!" });
+    const chats = await Chat.find({
+      users: { $elemMatch: { $eq: lU.number } },
+    }).sort({ updatedAt: -1 });
 
-// const fetchChats = async (req, res) => {
-//   try {
-//     const chats = await Chat.find({
-//       users: { $elemMatch: { $eq: user.number } },
-//     }).sort({ updatedAt: -1 });
+    if (chats.length === 0)
+      return res.status(400).json({ message: "No chats found!" });
 
-//     if (chats.length === 0)
-//       return res.status(400).send({ message: "No chats found!" });
-
-//     return res.status(200).send(chats);
-//   } catch (error) {
-//     return res.status(500).send({ message: "Internal server error..." });
-//   }
-// };
+    return res.status(200).json(chats);
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: "Internal server error..." });
+  }
+};
 
 // const createGroupChat = async (req, res) => {
 //   try {
