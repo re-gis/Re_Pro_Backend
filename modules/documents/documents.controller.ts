@@ -4,10 +4,14 @@ import IResponse from "../../interfaces/IResponse";
 import User from "../../entities/User.entity";
 import {
   authorizeGoogleDrive,
+  deleteFileFromGoogleDrive,
+  extractFileIdFromUrl,
   getViewLink,
   uploadFileToGoogleDrive,
 } from "../../utils/authorizeGoogleDrive";
 import Document from "../../entities/document.entity";
+import { EPosition } from "../../enums/Enums";
+import e from "express";
 
 //  create document and save it
 export const createDocument = async (
@@ -75,9 +79,9 @@ export const createDocument = async (
     await docRepo.save(doc);
 
     return res.status(200).json({ message: "Document saved successfully." });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in createDocument:", error);
-    return res.status(500).json({ message: "Internal server error." });
+    return res.status(500).json({ message: "Internal server error." + error.message });
   }
 };
 
@@ -102,7 +106,7 @@ export const getMyDocs = async (
       },
     });
     console.log(documents);
-    
+
     return res
       .status(200)
       .json({ message: "successfully fetched", documents: documents });
@@ -113,10 +117,6 @@ export const getMyDocs = async (
 
 
 // delete document 
-// export const deleteDoc= (req:IRequest, res:IResponse):Promise<IResponse> =>{
-  
-// }
-
 
 
 //  unwanted
@@ -179,8 +179,6 @@ export const getMyDocs = async (
 //     return res.status(500).json({ message: "Internal server error..." });
 //   }
 // };
-
-
 
 // // // Get my sent docs
 // export const getMyDocs = async (req:IRequest, res:IResponse) => {
