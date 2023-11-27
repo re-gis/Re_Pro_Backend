@@ -19,13 +19,13 @@ const upload = (0, multer_1.default)({
 const multerUpload = (req, res, next) => {
     upload.single("document")(req, res, next);
 };
-exports.documentRouter.post("/upload", userAuth_1.protect, documents_controller_1.createDocument);
+exports.documentRouter.post("/upload", userAuth_1.protect, (0, userAuth_1.isVerified)(), documents_controller_1.createDocument);
 // unwanted
 // documentRouter.post("/upload", protect, createDocument);
 // // Delete a document
 // documentRouter.delete("/:user/doc/:id/delete", protect, deleteDoc);
 // // Get my sent documents
-exports.documentRouter.get("/docs/:user", userAuth_1.protect, documents_controller_1.getMyDocs);
+exports.documentRouter.get("/docs/:user", userAuth_1.protect, (0, userAuth_1.isVerified)(), documents_controller_1.getMyDocs);
 // documentRouter.get("/:me/docs/sent", protect, getMyDocs);
 // // Get received documents
 // // documentRouter.get("/:me/docs/received", protect, getReceivedDocs);

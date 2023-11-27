@@ -82,6 +82,7 @@ export const role = (...roles: EPosition[]) => {
 
 export const isVerified = () => {
   return (req: IRequest, res: IResponse, next: NextFunction) => {
+    console.log("hy")
     if (req.user.verified != true) {
       return res
         .status(403)

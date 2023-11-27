@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.role = exports.protect = void 0;
+exports.isVerified = exports.role = exports.protect = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const User_entity_1 = __importDefault(require("../entities/User.entity"));
 const typeorm_1 = require("typeorm");
@@ -43,7 +43,7 @@ const protect = async (req, res, next) => {
                     church: user.church,
                     position: user.position,
                     verified: user.verified,
-                    documents: user.documents
+                    documents: user.documents,
                 };
                 next();
             });
@@ -62,8 +62,6 @@ const protect = async (req, res, next) => {
 exports.protect = protect;
 const role = (...roles) => {
     return (req, res, next) => {
-        console.log(roles);
-        console.log(req.user.position);
         if (roles[0] != req.user.position) {
             return res
                 .status(403)
@@ -75,3 +73,17 @@ const role = (...roles) => {
     };
 };
 exports.role = role;
+const isVerified = () => {
+    return (req, res, next) => {
+        console.log("hy");
+        if (req.user.verified != true) {
+            return res
+                .status(403)
+                .json({ message: "Verify the account to continue..." });
+        }
+        else {
+            next();
+        }
+    };
+};
+exports.isVerified = isVerified;

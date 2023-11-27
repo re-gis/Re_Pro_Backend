@@ -59,65 +59,93 @@ export const fetchMyChats = async (req: IRequest, res: IResponse) => {
 
     return res.status(200).json(chats);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({ message: "Internal server error..." });
   }
 };
 
-// const createGroupChat = async (req, res) => {
-//   try {
-//     if (!req.body.users || !req.body.name)
-//       return res.status(400).send({ message: "All inputs are required!" });
-//     let { name, users } = req.body;
-//     if (users.length <= 2)
-//       return res.status(400).send({
-//         message: "More than two members are required to form a group chat!",
-//       });
+export const createGroupChat = async (req: IRequest, res: IResponse) => {
+  try {
+    const userRepo: Repository<User> = getRepository(User);
+    const user: User = req.user;
 
-//     const grpValid = await Chat.findOne({ name });
-//     if (grpValid)
-//       return res.status(400).send({ message: "Group name already taken!" });
-//     // Create chat group
-//     users.push(user.number);
-//     const group = await Chat.create({
-//       chatName: name,
-//       users: users,
-//       isGroupChat: true,
-//       groupAdmin: user.number,
-//     });
-//     if (!group)
-//       return res.status(500).send({ message: "Internal server error..." });
-//     return res.status(201).send({ message: "Chat created!", chat: group });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+    const lU = await userRepo.findOne({ where: { email: user.email } });
+    if (!lU) return res.status(404).json({ message: "User not found!" });
 
-// const renameGroup = async (req, res) => {
-//   try {
-//     const { chatId, chatName } = req.body;
-//     if (!chatId)
-//       return res.status(500).send({ message: "Something occurred!" });
-//     if (!chatName)
-//       return res.status(400).send({ message: "Chat name required!" });
-//     const updatedChat = await Chat.findByIdAndUpdate(
-//       chatId,
-//       {
-//         chatName,
-//       },
-//       {
-//         new: true,
-//       }
-//     );
+    if (!req.body.users || !req.body.name)
+      return res.status(400).json({ message: "All inputs are required!" });
+    let name = req.body.name;
+    let users: string[] = req.body.users;
 
-//     // get the chat
-//     const chat = await Chat.findById(chatId);
-//     if (!chat) return res.status(400).send({ message: "Something occurred!" });
-//     return res.status(201).send({ message: "Updated chat", chat });
-//   } catch (error) {
-//     return res.status(500).send({ message: "Internal server error..." });
-//   }
-// };
+    // existence of the users
+    let i;
+    for (i = 0; i < users.length; i++) {
+      const u = await userRepo.findOne({ where: { number: users[i] } });
+      if (!u)
+        return res.status(404).json({ message: `User ${users[i]} not found!` });
+    }
+    if (users.length <= 2)
+      return res.status(400).json({
+        message: "More than two members are required to form a group chat!",
+      });
+
+    const grpValid = await Chat.findOne({ name });
+    if (grpValid)
+      return res.status(400).json({ message: "Group name already taken!" });
+    // Create chat group
+    users.push(lU.number);
+    const group = await Chat.create({
+      chatName: name,
+      users: users,
+      isGroupChat: true,
+      groupAdmin: lU.number,
+    });
+    if (!group)
+      return res.status(500).json({ message: "Internal server error..." });
+    return res.status(201).json({ message: "Chat created!", chat: group });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error..." });
+  }
+};
+
+export const renameGroup = async (req: IRequest, res: IResponse) => {
+  try {
+    const { chatName } = req.body;
+    const chatId = req.params.id;
+    const userRepo: Repository<User> = getRepository(User);
+    const user: User = req.user;
+    const lUser = await userRepo.findOne({ where: { email: user.email } });
+    if (!lUser) return res.status(404).json({ message: "User not found!" });
+    if (!chatId)
+      return res.status(500).json({ message: "Something occurred!" });
+    if (!chatName)
+      return res.status(400).json({ message: "Chat name required!" });
+
+    // check if the one to update is the owner
+    const eChat = await Chat.findById(chatId);
+    if (!eChat)
+      return res.status(404).json({ message: `Chat ${chatId} not found!` });
+    if (eChat.groupAdmin != lUser.number)
+      return res
+        .status(403)
+        .json({ message: "You are not authorised to perform this action..." });
+
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        chatName,
+      },
+      {
+        new: true,
+      }
+    );
+
+    return res.status(201).json({ message: "Updated chat", updatedChat });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error..." });
+  }
+};
 
 // const removeFromGroup = async (req, res) => {};
 

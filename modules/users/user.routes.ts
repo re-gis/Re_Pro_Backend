@@ -45,39 +45,39 @@ userRouter.get(
 );
 
 // Update user stats
-userRouter.put("/register/update", protect, isVerified, updateUserStats);
+userRouter.put("/register/update", protect, isVerified(), updateUserStats);
 
 // Login user
-userRouter.post("/login", isVerified, loginUser);
+userRouter.post("/login", isVerified(), loginUser);
 
 // Forgot password
-userRouter.post("/password/forgot", protect, isVerified, forgotPassword);
+userRouter.post("/password/forgot", protect, isVerified(), forgotPassword);
 
 // Reset password
-userRouter.post("/password/reset", protect, isVerified, resetPassword);
+userRouter.post("/password/reset", protect, isVerified(), resetPassword);
 
 // Upload profile picture
-userRouter.post("/profile/photo/upload", protect, isVerified, uploadPicture);
+userRouter.post("/profile/photo/upload", protect, isVerified(), uploadPicture);
 
 // Remove profile pic
 userRouter.put(
   "/:user/profile/photo/remove",
   protect,
-  isVerified,
+  isVerified(),
   profilePicRemove
 );
 
 // get any user profile
-userRouter.get("/:user/profile", protect, isVerified, getAnyUserProfile);
+userRouter.get("/:user/profile", protect, isVerified(), getAnyUserProfile);
 
 // Get my profile
-userRouter.get("/my/profile", protect, isVerified, getUserProfile);
+userRouter.get("/my/profile", protect, isVerified(), getUserProfile);
 
 // Update user profile
-userRouter.put("/profile/update", protect, isVerified, updateProfile);
+userRouter.put("/profile/update", protect, isVerified(), updateProfile);
 
 // Delete account
-userRouter.delete("/profile/delete", protect, isVerified, deleteMyAccount);
+userRouter.delete("/profile/delete", protect, isVerified(), deleteMyAccount);
 
 // Get total workers
 // userRouter.get("/workers", getTotalWorkers);

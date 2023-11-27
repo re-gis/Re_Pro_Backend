@@ -81,9 +81,9 @@ exports.deleteFileFromGoogleDrive = deleteFileFromGoogleDrive;
 //  modifying webContentLink
 function getViewLink(driveLink) {
     // Remove the export=download parameter, if present
-    const cleanLink = driveLink.replace(/&export=download/g, '');
+    const cleanLink = driveLink.replace(/&export=download/g, "");
     // If the link ends with '?' or '&', remove it
-    const finalLink = cleanLink.replace(/[?&]$/, '');
+    const finalLink = cleanLink.replace(/[?&]$/, "");
     return finalLink;
 }
 exports.getViewLink = getViewLink;

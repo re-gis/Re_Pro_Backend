@@ -20,9 +20,11 @@
 // module.exports = chatRouter;
 
 import express from "express";
-import { accessChat, fetchMyChats } from "./chat.controllers";
+import { accessChat, createGroupChat, fetchMyChats, renameGroup } from "./chat.controllers";
 import { isVerified, protect } from "../../middlewares/userAuth";
 export const chatRouter = express.Router();
 
-chatRouter.post("/", protect, isVerified,accessChat);
-chatRouter.get("/", protect, isVerified, fetchMyChats)
+chatRouter.post("/", protect, isVerified(), accessChat);
+chatRouter.get("/", protect, isVerified(), fetchMyChats);
+chatRouter.put("/:id/rename", protect, isVerified(), renameGroup);
+chatRouter.post("/group", protect, isVerified(), createGroupChat)

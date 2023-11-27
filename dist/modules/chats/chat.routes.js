@@ -26,4 +26,7 @@ const express_1 = __importDefault(require("express"));
 const chat_controllers_1 = require("./chat.controllers");
 const userAuth_1 = require("../../middlewares/userAuth");
 exports.chatRouter = express_1.default.Router();
-exports.chatRouter.post("/", userAuth_1.protect, chat_controllers_1.accessChat);
+exports.chatRouter.post("/", userAuth_1.protect, (0, userAuth_1.isVerified)(), chat_controllers_1.accessChat);
+exports.chatRouter.get("/", userAuth_1.protect, (0, userAuth_1.isVerified)(), chat_controllers_1.fetchMyChats);
+exports.chatRouter.put("/:id/rename", userAuth_1.protect, (0, userAuth_1.isVerified)(), chat_controllers_1.renameGroup);
+exports.chatRouter.post("/group", userAuth_1.protect, (0, userAuth_1.isVerified)(), chat_controllers_1.createGroupChat);

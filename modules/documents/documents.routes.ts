@@ -1,5 +1,5 @@
 import express, { NextFunction } from "express";
-import { protect } from "../../middlewares/userAuth";
+import { isVerified, protect } from "../../middlewares/userAuth";
 import { createDocument, getMyDocs } from "./documents.controller";
 import { storage } from "../../config/Multer";
 import multer from "multer";
@@ -24,7 +24,7 @@ const multerUpload: MulterRequestHandler = (req, res, next) => {
   (upload.single("document") as any)(req, res, next);
 };
 
-documentRouter.post("/upload", protect, createDocument);
+documentRouter.post("/upload", protect, isVerified(),createDocument);
 
 // unwanted
 // documentRouter.post("/upload", protect, createDocument);
@@ -33,7 +33,7 @@ documentRouter.post("/upload", protect, createDocument);
 // documentRouter.delete("/:user/doc/:id/delete", protect, deleteDoc);
 
 // // Get my sent documents
-documentRouter.get("/docs/:user", protect, getMyDocs);
+documentRouter.get("/docs/:user", protect, isVerified(),getMyDocs);
 
 // documentRouter.get("/:me/docs/sent", protect, getMyDocs);
 
