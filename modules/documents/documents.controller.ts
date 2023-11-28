@@ -116,8 +116,80 @@ export const getMyDocs = async (
 };
 
 
-// delete document 
+// delete document
+export const deleteDoc = async (
+  req: IRequest,
+  res: IResponse
+): Promise<IResponse> => {
+  const userRepo: Repository<User> = getRepository(User);
+  const docRepo: Repository<Document> = getRepository(Document);
+  const user: User = req.user;
+  const userName: string = req.params.user;
+  const docId = parseInt(req.params.id);
+  console.log(userName, docId);
 
+  if (!user) {
+    return res.status(401).json({ message: "Please log in to continue." });
+  }
+
+  const userInRepo = await userRepo.findOne({
+    where: { name:userName },
+    relations: ["documents"],
+  });
+
+  console.log(userInRepo);
+
+  
+  if (!userInRepo) {
+    return res.status(404).json({ message: "User not found." });
+  }
+
+
+
+   //  check if doc is found in the repository
+   const docToDelete = await docRepo.findOne({
+    where: { id: docId },
+    relations: ["user"],
+  });
+  
+   if (!docToDelete) {
+     return res.status(404).json({ message: "Document not found" });
+   }
+
+   console.log(user.id , docToDelete.user.id);
+   
+
+  // Check if the user is authorized to delete the document
+  if 
+  (  userInRepo.position == EPosition.SUPER ||
+    userInRepo.position == EPosition.SECRETARY ||
+    user.id == docToDelete.user.id
+  ) {
+      //  extract fileId form usrl
+
+  const fileId = extractFileIdFromUrl(docToDelete.filepath);
+  //  delete document id db
+  await docRepo.remove(docToDelete);
+
+  //   delete document in google drive
+  const authClient = await authorizeGoogleDrive();
+  await deleteFileFromGoogleDrive(fileId, authClient);
+
+
+  //  update user 
+  userInRepo.documents = userInRepo.documents.filter((doc) => doc.id == docId);
+  await userRepo.save(userInRepo);
+  return res.status(200).json({ message: "document have been deleted successfully" });
+   } else if(userInRepo?.id != user.id) {
+    return res.status(404).json({ message: "please login to continue" });
+
+  } else{
+    return res.status(401).json({ message: "You are not authorized to perform this action." });
+  }
+
+
+
+};
 
 //  unwanted
 
