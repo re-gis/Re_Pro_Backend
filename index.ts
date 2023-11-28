@@ -14,6 +14,7 @@ import { connectDatabase } from "./config/mongodb/db";
 import { adminRouter } from "./modules/admin/admin.routes";
 import { documentRouter } from "./modules/documents/documents.routes";
 import { chatRouter } from "./modules/chats/chat.routes";
+import http from 'http'
 // Fileuploader
 app.use(
   fileUploader({
@@ -69,6 +70,9 @@ const io = new Server(server, {
     origin: "*",
   },
 });
+
+//@ts-ignore
+server.maxHttpBufferSize = 1e8;
 
 io.on("connection", (socket: Socket) => {
   console.log("connected");

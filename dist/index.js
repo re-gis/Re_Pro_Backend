@@ -56,6 +56,8 @@ const io = new Server(server, {
         origin: "*",
     },
 });
+//@ts-ignore
+server.maxHttpBufferSize = 1e8;
 io.on("connection", (socket) => {
     console.log("connected");
     socket.on("setup", (userData) => {
