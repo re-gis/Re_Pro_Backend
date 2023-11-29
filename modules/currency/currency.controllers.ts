@@ -1,93 +1,92 @@
-// const mysql = require("mysql");
+import { Repository, getRepository } from "typeorm";
+import IRequest from "../../interfaces/IRequest";
+import IResponse from "../../interfaces/IResponse";
+import Currency from "../../entities/currency.entity";
 
-// const conn = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "re_pro",
-// });
+ const createFund = async (req:IRequest, res:IResponse) => {
+   const e = req.body.expenses ? req.body.expenses : 0;
+   const a = req.body.totalAmount ? req.body.totalAmount : 0;
+   const expenses = `RWF ${e}`;
+   const totalAmount = `RWF ${a}`;
+   const currencyRepo:Repository<Currency> = getRepository(Currency)
 
-// // const createFund = async (req, res) => {
-// //   const e = req.body.expenses ? req.body.expenses : 0;
-// //   const a = req.body.totalAmount ? req.body.totalAmount : 0;
-// //   const expenses = `RWF ${e}`;
-// //   const totalAmount = `RWF ${a}`;
+   if (a > e) {
+     const profit = `RWF ${a - e}`;
 
-// //   if (a > e) {
-// //     const profit = `RWF ${a - e}`;
+    //   Before drop other funds
+     const sql = `DELETE FROM currency`;
+     await currencyRepo.Currency_Repo.deleteAll();
 
-// //     // Before drop other funds
-// //     const sql = `DELETE FROM currency`;
-// //     conn.query(sql, async (error) => {
-// //       if (error) {
-// //         return res.status(500).send({ message: "Internal server error..." });
-// //       } else {
-// //         // save to database
-// //         const sql = `INSERT INTO currency (total_amount, expenses, profit) VALUES ('${totalAmount}', '${expenses}', '${profit}')`;
-// //         conn.query(sql, async (error) => {
-// //           // console.log(error)
-// //           if (error) {
-// //             return res
-// //               .status(500)
-// //               .send({ message: "Internal server error..." });
-// //           } else {
-// //             // save to database
-// //             const sql = `SELECT * FROM currency`;
-// //             conn.query(sql, async (error, data) => {
-// //               if (error) {
-// //                 return res
-// //                   .status(500)
-// //                   .send({ message: "Internal server error..." });
-// //               } else {
-// //                 return res.status(201).send({
-// //                   funds: data,
-// //                   message: "Funds Inserted!",
-// //                 });
-// //               }
-// //             });
-// //           }
-// //         });
-// //       }
-// //     });
-// //   } else {
-// //     // save the loss
-// //      const loss = `RWF ${e - a}`;
+     conn.query(sql, async (error) => {
+       if (error) {
+         return res.status(500).send({ message: "Internal server error..." });
+       } else {
+        //   save to database
+         const sql = `INSERT INTO currency (total_amount, expenses, profit) VALUES ('${totalAmount}', '${expenses}', '${profit}')`;
+         conn.query(sql, async (error) => {
+            console.log(error)
+           if (error) {
+             return res
+               .status(500)
+               .send({ message: "Internal server error..." });
+           } else {
+            //   save to database
+             const sql = `SELECT * FROM currency`;
+             conn.query(sql, async (error, data) => {
+               if (error) {
+                 return res
+                   .status(500)
+                   .send({ message: "Internal server error..." });
+               } else {
+                 return res.status(201).send({
+                   funds: data,
+                   message: "Funds Inserted!",
+                 });
+               }
+             });
+           }
+         });
+       }
+     });
+   } else {
+    //   save the loss
+      const loss = `RWF ${e - a}`;
 
-// //      // Before drop other funds
-// //      const sql = `DELETE FROM currency`;
-// //      conn.query(sql, async (error) => {
-// //        if (error) {
-// //          return res.status(500).send({ message: "Internal server error..." });
-// //        } else {
-// //          // save to database
-// //          const sql = `INSERT INTO currency (total_amount, expenses, loss) VALUES ('${totalAmount}', '${expenses}', '${loss}')`;
-// //          conn.query(sql, async (error) => {
-// //            // console.log(error)
-// //            if (error) {
-// //              return res
-// //                .status(500)
-// //                .send({ message: "Internal server error..." });
-// //            } else {
-// //              // save to database
-// //              const sql = `SELECT * FROM currency`;
-// //              conn.query(sql, async (error, data) => {
-// //                if (error) {
-// //                  return res
-// //                    .status(500)
-// //                    .send({ message: "Internal server error..." });
-// //                } else {
-// //                  return res.status(201).send({
-// //                    funds: data,
-// //                    message: "Funds Inserted!",
-// //                  });
-// //                }
-// //              });
-// //            }
-// //          });
-// //        }
-// //      });
-// //   }
-// // };
+    //    Before drop other funds
+      const sql = `DELETE FROM currency`;
+      conn.query(sql, async (error) => {
+        if (error) {
+          return res.status(500).send({ message: "Internal server error..." });
+        } else {
+        //    save to database
+          const sql = `INSERT INTO currency (total_amount, expenses, loss) VALUES ('${totalAmount}', '${expenses}', '${loss}')`;
+          conn.query(sql, async (error) => {
+             console.log(error)
+            if (error) {
+              return res
+                .status(500)
+                .send({ message: "Internal server error..." });
+            } else {
+            //    save to database
+              const sql = `SELECT * FROM currency`;
+              conn.query(sql, async (error, data) => {
+                if (error) {
+                  return res
+                    .status(500)
+                    .send({ message: "Internal server error..." });
+                } else {
+                  return res.status(201).send({
+                    funds: data,
+                    message: "Funds Inserted!",
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+   }
+ };
 
 // // Creating funds
 // const createFund = async (req, res) => {
