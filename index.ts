@@ -14,7 +14,7 @@ import { connectDatabase } from "./config/mongodb/db";
 import { adminRouter } from "./modules/admin/admin.routes";
 import { documentRouter } from "./modules/documents/documents.routes";
 import { chatRouter } from "./modules/chats/chat.routes";
-import http from 'http'
+import http from "http";
 // Fileuploader
 app.use(
   fileUploader({
@@ -110,12 +110,31 @@ io.on("connection", (socket: Socket) => {
       socket.on(
         "file",
         (data: { file: { data: Uint8Array; name: string } }) => {
-          const fileBuffer = Buffer.from(data.file.data);
-          const filename = Date.now() + "-" + data.file.name;
+          try {
+            const { data: fileData, name: originalFilename } = data.file;
 
-          fs.writeFileSync("./uploads/" + filename, fileBuffer);
-          socket.emit("file-uploaded", { url: `/uploads/${filename}` });
-          socket.emit("new-file-message", { url: `/uploads/${filename}` });
+            // Convert Uint8Array to Buffer
+            const fileBuffer = Buffer.from(fileData);
+
+            // Generate a unique filename with a timestamp
+            const filename = `${Date.now()}-${originalFilename}`;
+
+            // Write the file to the server in the "./uploads/" directory
+            const filePath = `./uploads/${filename}`;
+            fs.writeFileSync(filePath, fileBuffer);
+
+            // Emit events to the sender
+            socket.emit("file-uploaded", { url: `/uploads/${filename}` });
+            socket.emit("new-file-message", { url: `/uploads/${filename}` });
+
+            console.log(`File ${originalFilename} uploaded successfully.`);
+          } catch (error: any) {
+            // Handle any errors that may occur during file processing
+            console.error("Error processing file:", error.message);
+            socket.emit("file-upload-error", {
+              message: "Error processing file.",
+            });
+          }
         }
       );
 
