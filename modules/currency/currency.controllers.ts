@@ -2,89 +2,37 @@ import { Repository, getRepository } from "typeorm";
 import IRequest from "../../interfaces/IRequest";
 import IResponse from "../../interfaces/IResponse";
 import Currency from "../../entities/currency.entity";
+import User from "../../entities/User.entity";
 
- const createFund = async (req:IRequest, res:IResponse) => {
-   const e = req.body.expenses ? req.body.expenses : 0;
-   const a = req.body.totalAmount ? req.body.totalAmount : 0;
+ export const createFund = async (req:IRequest, res:IResponse) => {
+   const e:number = req.body.expenses ? req.body.expenses : 0;
+   const a:number = req.body.totalAmount ? req.body.totalAmount : 0;
    const expenses = `RWF ${e}`;
    const totalAmount = `RWF ${a}`;
    const currencyRepo:Repository<Currency> = getRepository(Currency)
+   await currencyRepo.clear();
+   const user:User = req.user
+   const userRepo:Repository<User> = getRepository(User)
+   const u = await userRepo.findOne({where: {email:user.email}})
+   if(!u) return res.status(404).json({message:"User not found!"})
 
    if (a > e) {
-     const profit = `RWF ${a - e}`;
+     // if the expenses are less than the total amount
+     const profit:string = `RWF ${a - e}`;
+    // save them to the database
+    const c = currencyRepo.create({
+      expenses,
+      number: u.number,
+      profit
+    })
 
-    //   Before drop other funds
-     const sql = `DELETE FROM currency`;
-     await currencyRepo.Currency_Repo.deleteAll();
+   }else if(e>a){
+    // if the expenses are greater than the total amount
+    const loss:string = `RWF ${e-a}`
 
-     conn.query(sql, async (error) => {
-       if (error) {
-         return res.status(500).send({ message: "Internal server error..." });
-       } else {
-        //   save to database
-         const sql = `INSERT INTO currency (total_amount, expenses, profit) VALUES ('${totalAmount}', '${expenses}', '${profit}')`;
-         conn.query(sql, async (error) => {
-            console.log(error)
-           if (error) {
-             return res
-               .status(500)
-               .send({ message: "Internal server error..." });
-           } else {
-            //   save to database
-             const sql = `SELECT * FROM currency`;
-             conn.query(sql, async (error, data) => {
-               if (error) {
-                 return res
-                   .status(500)
-                   .send({ message: "Internal server error..." });
-               } else {
-                 return res.status(201).send({
-                   funds: data,
-                   message: "Funds Inserted!",
-                 });
-               }
-             });
-           }
-         });
-       }
-     });
-   } else {
-    //   save the loss
-      const loss = `RWF ${e - a}`;
+   }else {
+    // if they are equal
 
-    //    Before drop other funds
-      const sql = `DELETE FROM currency`;
-      conn.query(sql, async (error) => {
-        if (error) {
-          return res.status(500).send({ message: "Internal server error..." });
-        } else {
-        //    save to database
-          const sql = `INSERT INTO currency (total_amount, expenses, loss) VALUES ('${totalAmount}', '${expenses}', '${loss}')`;
-          conn.query(sql, async (error) => {
-             console.log(error)
-            if (error) {
-              return res
-                .status(500)
-                .send({ message: "Internal server error..." });
-            } else {
-            //    save to database
-              const sql = `SELECT * FROM currency`;
-              conn.query(sql, async (error, data) => {
-                if (error) {
-                  return res
-                    .status(500)
-                    .send({ message: "Internal server error..." });
-                } else {
-                  return res.status(201).send({
-                    funds: data,
-                    message: "Funds Inserted!",
-                  });
-                }
-              });
-            }
-          });
-        }
-      });
    }
  };
 
