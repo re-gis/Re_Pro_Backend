@@ -15,6 +15,7 @@ import { adminRouter } from "./modules/admin/admin.routes";
 import { documentRouter } from "./modules/documents/documents.routes";
 import { chatRouter } from "./modules/chats/chat.routes";
 import http from "http";
+import { currencyRouter } from "./modules/currency/currency.routes";
 // Fileuploader
 app.use(
   fileUploader({
@@ -55,7 +56,7 @@ app.use("/api/users", userRouter);
 app.use("/api/admin", adminRouter);
 
 // Currency apis
-// app.use("/api/currency", currencyRouter);
+app.use("/api/currency", currencyRouter);
 
 // Room chat apis
 app.use("/api/chat", chatRouter);

@@ -29,7 +29,7 @@ exports.userRouter.get("/google/callback", passport_1.default.authenticate("goog
 // Update user stats
 exports.userRouter.put("/register/update", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.updateUserStats);
 // Login user
-exports.userRouter.post("/login", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.loginUser);
+exports.userRouter.post("/login", user_Controllers_1.loginUser);
 // Forgot password
 exports.userRouter.post("/password/forgot", userAuth_1.protect, (0, userAuth_1.isVerified)(), user_Controllers_1.forgotPassword);
 // Reset password

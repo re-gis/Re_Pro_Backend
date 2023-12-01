@@ -11,7 +11,7 @@ export default class Currency {
   @Column({ type: "varchar", nullable: false })
   owner: string;
 
-  @Column({ type: "datetime" })
+  @Column({ type: "date" })
   date: Date;
 
   @Column({ type: "varchar", nullable: false })

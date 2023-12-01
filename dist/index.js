@@ -17,6 +17,7 @@ const db_1 = require("./config/mongodb/db");
 const admin_routes_1 = require("./modules/admin/admin.routes");
 const documents_routes_1 = require("./modules/documents/documents.routes");
 const chat_routes_1 = require("./modules/chats/chat.routes");
+const currency_routes_1 = require("./modules/currency/currency.routes");
 // Fileuploader
 app.use((0, express_fileupload_1.default)({
     useTempFiles: true,
@@ -44,7 +45,7 @@ app.use("/api/users", user_routes_1.userRouter);
 // admin apis
 app.use("/api/admin", admin_routes_1.adminRouter);
 // Currency apis
-// app.use("/api/currency", currencyRouter);
+app.use("/api/currency", currency_routes_1.currencyRouter);
 // Room chat apis
 app.use("/api/chat", chat_routes_1.chatRouter);
 const server = app.listen(process.env.PORT, () => {
@@ -80,11 +81,27 @@ io.on("connection", (socket) => {
             socket.in(user._id).emit("message received", newMsgReceived);
         });
         socket.on("file", (data) => {
-            const fileBuffer = Buffer.from(data.file.data);
-            const filename = Date.now() + "-" + data.file.name;
-            fs_1.default.writeFileSync("./uploads/" + filename, fileBuffer);
-            socket.emit("file-uploaded", { url: `/uploads/${filename}` });
-            socket.emit("new-file-message", { url: `/uploads/${filename}` });
+            try {
+                const { data: fileData, name: originalFilename } = data.file;
+                // Convert Uint8Array to Buffer
+                const fileBuffer = Buffer.from(fileData);
+                // Generate a unique filename with a timestamp
+                const filename = `${Date.now()}-${originalFilename}`;
+                // Write the file to the server in the "./uploads/" directory
+                const filePath = `./uploads/${filename}`;
+                fs_1.default.writeFileSync(filePath, fileBuffer);
+                // Emit events to the sender
+                socket.emit("file-uploaded", { url: `/uploads/${filename}` });
+                socket.emit("new-file-message", { url: `/uploads/${filename}` });
+                console.log(`File ${originalFilename} uploaded successfully.`);
+            }
+            catch (error) {
+                // Handle any errors that may occur during file processing
+                console.error("Error processing file:", error.message);
+                socket.emit("file-upload-error", {
+                    message: "Error processing file.",
+                });
+            }
         });
         socket.off("setup", (userData) => {
             console.log("disconnected");

@@ -48,7 +48,7 @@ userRouter.get(
 userRouter.put("/register/update", protect, isVerified(), updateUserStats);
 
 // Login user
-userRouter.post("/login",protect, isVerified(), loginUser);
+userRouter.post("/login", loginUser);
 
 // Forgot password
 userRouter.post("/password/forgot", protect, isVerified(), forgotPassword);
