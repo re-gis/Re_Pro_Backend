@@ -133,10 +133,10 @@ const updateFund = async (req, res) => {
                 // save them to the database
                 const c = currencyRepo.create({
                     expenses: `RWF ${ee}`,
-                    number: u.number,
+                    number: user.number,
                     profit,
                     loss: "RWF 0",
-                    owner: u.email,
+                    owner: user.email,
                     totalAmount: `RWF ${tt}`,
                 });
                 if (!(await currencyRepo.save(c))) {
@@ -154,10 +154,10 @@ const updateFund = async (req, res) => {
                 // save them to the database
                 const c = currencyRepo.create({
                     expenses: `RWF ${ee}`,
-                    number: u.number,
+                    number: user.number,
                     profit: "RWF 0",
                     loss,
-                    owner: u.email,
+                    owner: user.email,
                     totalAmount: `RWF ${tt}`,
                 });
                 if (!(await currencyRepo.save(c))) {
@@ -173,10 +173,10 @@ const updateFund = async (req, res) => {
                 // if they are equal
                 const c = currencyRepo.create({
                     expenses: `RWF ${ee}`,
-                    number: u.number,
+                    number: user.number,
                     profit: "RWF 0",
                     loss: "RWF 0",
-                    owner: u.email,
+                    owner: user.email,
                     totalAmount: `RWF ${tt}`,
                 });
                 if (!(await currencyRepo.save(c))) {
