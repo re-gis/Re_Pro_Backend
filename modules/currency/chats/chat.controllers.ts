@@ -1,8 +1,8 @@
 import { Repository, getRepository } from "typeorm";
-import User from "../../entities/User.entity";
-import { Chat } from "../../entities/chat.Model";
-import IRequest from "../../interfaces/IRequest";
-import IResponse from "../../interfaces/IResponse";
+import User from "../../../entities/User.entity";
+import { Chat } from "../../../entities/chat.Model";
+import IRequest from "../../../interfaces/IRequest";
+import IResponse from "../../../interfaces/IResponse";
 
 export const accessChat = async (req: IRequest, res: IResponse) => {
   try {
