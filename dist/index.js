@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv").config();
 const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -16,8 +17,8 @@ const typeorm_1 = require("typeorm");
 const db_1 = require("./config/mongodb/db");
 const admin_routes_1 = require("./modules/admin/admin.routes");
 const documents_routes_1 = require("./modules/documents/documents.routes");
-const chat_routes_1 = require("./modules/chats/chat.routes");
 const currency_routes_1 = require("./modules/currency/currency.routes");
+const chat_routes_1 = require("./modules/currency/chats/chat.routes");
 // Fileuploader
 app.use((0, express_fileupload_1.default)({
     useTempFiles: true,
@@ -36,7 +37,7 @@ app.use("/uploads", express_1.default.static("uploads"));
 // Connect database
 (0, db_1.connectDatabase)(); // MongoDB
 // Swagger documentation
-// app.use("/documentation", swaggerUi.serve, swaggerUi.setup());
+app.use("/documentation", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup());
 app.use("/api/documents", documents_routes_1.documentRouter);
 // Use cors
 app.use((0, cors_1.default)());

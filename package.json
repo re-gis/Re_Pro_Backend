@@ -31,9 +31,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "cd socketServer && nodemon index.js",
+    "start": "node dist/index.js",
     "server": "node dist/index.js",
-    "dev": "concurrently \"npm run server\" \"npm start\""
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",

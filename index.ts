@@ -13,9 +13,9 @@ import { createConnection } from "typeorm";
 import { connectDatabase } from "./config/mongodb/db";
 import { adminRouter } from "./modules/admin/admin.routes";
 import { documentRouter } from "./modules/documents/documents.routes";
-import { chatRouter } from "./modules/currency/chats/chat.routes";
 import http from "http";
 import { currencyRouter } from "./modules/currency/currency.routes";
+import { chatRouter } from "./modules/currency/chats/chat.routes";
 // Fileuploader
 app.use(
   fileUploader({
@@ -42,7 +42,7 @@ connectDatabase(); // MongoDB
 
 // Swagger documentation
 
-// app.use("/documentation", swaggerUi.serve, swaggerUi.setup());
+app.use("/documentation", swaggerUi.serve, swaggerUi.setup());
 
 app.use("/api/documents", documentRouter);
 
