@@ -16,6 +16,7 @@ import { documentRouter } from "./modules/documents/documents.routes";
 import http from "http";
 import { currencyRouter } from "./modules/currency/currency.routes";
 import { chatRouter } from "./modules/currency/chats/chat.routes";
+import { connectPgDb } from "./config/pg/pg";
 // Fileuploader
 app.use(
   fileUploader({
@@ -27,9 +28,9 @@ app.use(
   })
 );
 
-createConnection()
-  .then((con) => console.log("Postgres connected successfully!"))
-  .catch((e) => console.log(e));
+// createConnection()
+//   .then((con) => console.log("Postgres connected successfully!"))
+//   .catch((e) => console.log(e));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -37,7 +38,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/uploads", express.static("uploads"));
 
 // Connect database
-
+connectPgDb(); /* Postgres */
 connectDatabase(); // MongoDB
 
 // Swagger documentation
