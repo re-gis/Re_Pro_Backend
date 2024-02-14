@@ -13,6 +13,8 @@ import Otp from "../../entities/otp.entity";
 import { EPosition } from "../../enums/Enums";
 import cloudinary from "../../config/cloudinary";
 import { Document } from "mongoose";
+import { sendEmail } from "../../utils/sendEmail";
+import { getWOrkersByPosition } from "../../utils/getWorkersByPosition";
 
 const object = Joi.object({
   email: Joi.string().min(3).email().max(200).required(),
@@ -238,7 +240,7 @@ export const updateUserStats = async (
           .status(404)
           .json({ message: `User ${user.email} not found!` });
       }
-      
+
       euser.church = church;
       euser.language = language;
       euser.idNumber = idNumber;
@@ -623,6 +625,63 @@ export const deleteMyAccount = async (
 //   });
 // };
 
+// get the workers according to the role
+export const getWOrkersByRole = async (
+  req: IRequest,
+  res: IResponse
+): Promise<IResponse> => {
+  try {
+    const user = req.user;
+    if (!user)
+      return res.status(403).json({ message: "Please login to continue!" });
+
+    const role: EPosition = req.body.role;
+    if (!role)
+      return res.status(400).json({ message: "Position is required!" });
+    let users;
+    switch (role) {
+      case EPosition.BISHOP:
+        users = await getWOrkersByPosition(EPosition.BISHOP);
+        break;
+
+      case EPosition.EVANGELIST:
+        users = await getWOrkersByPosition(EPosition.EVANGELIST);
+        break;
+
+      case EPosition.HUMRE:
+        users = await getWOrkersByPosition(EPosition.HUMRE);
+        break;
+
+      case EPosition.PASTOR:
+        users = await getWOrkersByPosition(EPosition.PASTOR);
+        break;
+
+      case EPosition.POs:
+        users = await getWOrkersByPosition(EPosition.POs);
+        break;
+
+      case EPosition.SECRETARY:
+        users = await getWOrkersByPosition(EPosition.SECRETARY);
+        break;
+
+      case EPosition.SUPER:
+        users = await getWOrkersByPosition(EPosition.SUPER);
+        break;
+
+      default:
+        return res
+          .status(400)
+          .json({ message: `Position ${role} is not supported!` });
+    }
+
+    if (!users)
+      return res.status(404).json({ message: `No ${role} users found!` });
+    return res.status(200).json({ users });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
 // // Get pastors
 // const getPastors = async (req: IRequest, res: IResponse) => {
 //   // get users whose position = pastor
@@ -640,57 +699,96 @@ export const deleteMyAccount = async (
 //   });
 // };
 
-// // Change user password
-// const passwordChange = async (req: IRequest, res: IResponse) => {
-//   const user = req.user;
-//   if (!user) return res.status(401).json({ message: "Not authorised!" });
-//   // Get user from the url
-//   const userName = req.params.user;
-//   // Compare to token
-//   if (userName === user.name) {
-//     // Get password
-//     const newPassword = req.body.newPassword;
-//     const oldPassword = req.body.oldPassword;
-//     const cp = req.body.confirmPass;
+export const passwordChange = async (
+  req: IRequest,
+  res: IResponse
+): Promise<IResponse> => {
+  try {
+    const user = req.user;
+    const userRepo: Repository<User> = getRepository(User);
+    if (!user)
+      return res.status(403).json({ message: "Please login to continue!" });
 
-//     if (!oldPassword)
-//       return res.status(400).json({ message: "Enter old password" });
-//     // Check if it matches the user's
-//     const validPass = await bcrypt.compare(oldPassword, user.password);
-//     if (!validPass)
-//       return res.status(403).json({ message: "Invalid password given!" });
-//     if (!newPassword)
-//       return res.status(400).json({ message: "Enter new password..." });
-//     // Change the password
-//     if (newPassword !== cp)
-//       return res
-//         .status(400)
-//         .json({ message: "Confirm password to proceed..." });
-//     const hp = await bcrypt.hash(newPassword, 10);
-//     const sql = `UPDATE users SET password='${hp}' WHERE number = '${user.number}' AND name='${user.name}' AND email='${user.email}'`;
-//     conn.query(sql, async (error: Error) => {
-//       // console.log(error)
-//       if (error)
-//         return res.status(500).json({ message: "Internal server error..." });
-//       // Get the user from database
-//       const sql = `SELECT * FROM users WHERE number ='${user.number}' AND email='${user.email}'`;
-//       conn.query(sql, async (error: Error, data: any) => {
-//         if (error)
-//           // console.log(error)
-//           return res.status(500).json({ message: "Internal server error..." });
-//         if (data.length === 0)
-//           return res.status(401).json({ message: "No user found!" });
-//         return res
-//           .status(201)
-//           .json({ message: "Password updated successfully!", user: data[0] });
-//       });
-//     });
-//   } else {
-//     return res
-//       .status(401)
-//       .json({ message: "Not authorised to perform this action!" });
-//   }
-// };
+    // get the user password
+    const u = await userRepo.findOne({ where: { email: user.email } });
+    if (!u) return res.status(404).json({ message: "User not found!" });
+
+    // get the oldpassword and the new password
+    const { oldpassword, newpassword, confirmpass } = req.body;
+    if (!oldpassword || !newpassword || !confirmpass)
+      return res.status(400).json({ message: "All passwords are required!" });
+
+    // check if the old password is valid
+    if (!(await bcryptjs.compare(oldpassword, u.password))) {
+      return res.status(400).json({ message: "Incorrect old password!" });
+    }
+
+    if (newpassword != confirmpass)
+      return res.status(400).json({ message: "Passwords mismatch" });
+
+    const hPass = await bcryptjs.hash(newpassword, 10);
+    u.password = hPass;
+
+    if (!(await userRepo.save(u)))
+      return res
+        .status(500)
+        .json({ message: "error while updating the password" });
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Internal server error...", error: err });
+  }
+};
+
+export const resetPasswordWhileNotLogged = async (
+  req: IRequest,
+  res: IResponse
+): Promise<IResponse> => {
+  try {
+    /*
+     * First get the user's email and phone number from the user
+     * get the email to send the link to reset password
+     * link: hashed idnumber && phone number
+     * if the link is valid then get the new password
+     */
+
+    const userRepo: Repository<User> = getRepository(User);
+    const { email, number } = req.body;
+    if (!email || !number)
+      return res
+        .status(400)
+        .json({ message: "Please all details are required!" });
+
+    // get the user with the same credentials in the database
+    const user = await userRepo.findOne({ where: { email, number } });
+    if (!user)
+      return res.status(404).json({
+        message: `User with email: ${email} and number: ${number} not found!`,
+      });
+
+    // if exists make a link
+    const port = process.env.PORT || 3001;
+    const hEmail = await bcryptjs.hash(email, 10);
+    const hNumber = await bcryptjs.hash(number, 10);
+    const link = `http://localhost:${port}/password/reset/:${hEmail}/:${hNumber}`;
+
+    try {
+      await sendEmail(email, "Link to reset your password", link);
+
+      return res.status(200).json({
+        message: "Check the link sent to your email to reset password!",
+      });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Error while sending the link!", error });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error...", error });
+  }
+};
 
 // const searchUser = async (req: IRequest, res: IResponse) => {
 //   const user = req.user;

@@ -8,8 +8,10 @@ import {
   getAnyUserProfile,
   getUserProfile,
   loginUser,
+  passwordChange,
   profilePicRemove,
   resetPassword,
+  resetPasswordWhileNotLogged,
   updateProfile,
   updateUserStats,
   uploadPicture,
@@ -79,6 +81,9 @@ userRouter.put("/profile/update", protect, isVerified(), updateProfile);
 // Delete account
 userRouter.delete("/profile/delete", protect, isVerified(), deleteMyAccount);
 
+// request the reset of password
+userRouter.post("/profile/password/reset", resetPasswordWhileNotLogged);
+
 // Get total workers
 // userRouter.get("/workers", getTotalWorkers);
 
@@ -86,7 +91,7 @@ userRouter.delete("/profile/delete", protect, isVerified(), deleteMyAccount);
 // userRouter.get("/workers/pastors", getPastors);
 
 // Change user password
-// userRouter.put("/:user/profile/password/change", protect, passwordChange);
+userRouter.put("/profile/password/change", protect, isVerified, passwordChange);
 
 // Search user
 // userRouter.post("/search", protect, searchUser);
